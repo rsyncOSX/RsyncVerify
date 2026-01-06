@@ -1,0 +1,47 @@
+//
+//  ReadImportConfigurationsJSON.swift
+//  RsyncVerify
+//
+//  Created by Thomas Evensen on 23/07/2024.
+//
+// swiftlint:disable line_length
+
+import DecodeEncodeGeneric
+import Foundation
+import OSLog
+
+@MainActor
+final class ReadImportConfigurationsJSON {
+    var importconfigurations: [SynchronizeConfiguration]?
+    var maxhiddenID: Int = -1
+
+    private func importjsonfile(_ filenameimport: String) {
+        let decodeimport = DecodeGeneric()
+        do {
+            let importeddata = try
+                decodeimport.decodeArray(DecodeSynchronizeConfiguration.self, fromFile: filenameimport)
+
+            importconfigurations = importeddata.map { importrecord in
+                var element = SynchronizeConfiguration(importrecord)
+                element.hiddenID = maxhiddenID + 1
+                element.dateRun = nil
+                element.backupID = "IMPORT: " + (importrecord.backupID ?? "")
+                element.id = UUID()
+                maxhiddenID += 1
+                return element
+            }
+            Logger.process.debugMessageOnly("ReadImportConfigurationsJSON - \(filenameimport) read import configurations from permanent storage")
+
+        } catch {
+            Logger.process.errorMessageOnly("ReadImportConfigurationsJSON - \(filenameimport): some ERROR read import configurations from permanent storage")
+            return
+        }
+    }
+
+    init(_ filenameimport: String, maxhiddenId: Int) {
+        maxhiddenID = maxhiddenId
+        importjsonfile(filenameimport)
+    }
+}
+
+// swiftlint:enable line_length

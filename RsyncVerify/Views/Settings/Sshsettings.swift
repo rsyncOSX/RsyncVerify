@@ -37,18 +37,6 @@ struct Sshsettings: View {
                                  selectedValue: sshsettings.sshportnumber)
                 }
 
-            Section(header: Text("Save userconfiguration")
-                .font(.title3)
-                .fontWeight(.bold)) {
-                    ConditionalGlassButton(
-                        systemImage: "square.and.arrow.down",
-                        text: "Save",
-                        helpText: "Save userconfiguration"
-                    ) {
-                        _ = WriteUserConfigurationJSON(UserConfiguration())
-                    }
-                }
-
             if localsshkeys == false {
                 Section(header: Text("SSH keys")
                     .font(.title3)

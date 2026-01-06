@@ -26,7 +26,6 @@ struct RsyncVerifyView: View {
             ReadUserConfigurationJSON().readuserconfiguration()
             // Get version of rsync
             rsyncversion.getRsyncVersion()
-            rsyncUIdata.executetasksinprogress = false
             // Load valid profilenames
             let catalognames = Homepath().getFullPathMacSerialCatalogsAsStringNames()
             rsyncUIdata.validprofiles = catalognames.map { catalog in
@@ -50,8 +49,6 @@ struct RsyncVerifyView: View {
             }
 
             rsyncUIdata.profile = profile
-            rsyncUIdata.executetasksinprogress = false
-
             rsyncUIdata.configurations = await ActorReadSynchronizeConfigurationJSON()
                 .readjsonfilesynchronizeconfigurations(profile,
                                                        SharedReference.shared.rsyncversion3)

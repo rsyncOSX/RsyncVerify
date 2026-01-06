@@ -57,27 +57,6 @@ struct RsyncandPathsettings: View {
                     setmarkdays
                 }
 
-            Section(header: Text("Backup configurations & Save userconfiguration")
-                .font(.title3)
-                .fontWeight(.bold)) {
-                    HStack {
-                        ConditionalGlassButton(
-                            systemImage: "wrench.adjustable.fill",
-                            text: "Backup configurations",
-                            helpText: "Backup configurations"
-                        ) {
-                            _ = Backupconfigfiles()
-                        }
-
-                        ConditionalGlassButton(
-                            systemImage: "square.and.arrow.down",
-                            text: "Save",
-                            helpText: "Save userconfiguration"
-                        ) {
-                            _ = WriteUserConfigurationJSON(UserConfiguration())
-                        }
-                    }
-                }
         }
         .formStyle(.grouped)
     }

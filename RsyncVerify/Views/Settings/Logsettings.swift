@@ -98,17 +98,6 @@ struct Logsettings: View {
                     }
                 }
 
-            Section(header: Text("Save userconfiguration")
-                .font(.title3)
-                .fontWeight(.bold)) {
-                    ConditionalGlassButton(
-                        systemImage: "square.and.arrow.down",
-                        text: "Save",
-                        helpText: "Save userconfiguration"
-                    ) {
-                        _ = WriteUserConfigurationJSON(UserConfiguration())
-                    }
-                }
         }
         .formStyle(.grouped)
     }

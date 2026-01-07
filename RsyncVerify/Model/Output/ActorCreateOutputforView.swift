@@ -32,20 +32,6 @@ actor ActorCreateOutputforView {
         return []
     }
 
-    // Show filelist for Restore, the TrimOutputForRestore prepares list
-    @concurrent
-    nonisolated func createoutputforrestore(_ stringoutputfromrsync: [String]?) async -> [RsyncOutputData] {
-        Logger.process.debugThreadOnly("ActorCreateOutputforView: createoutputforrestore()")
-        if let stringoutputfromrsync {
-            if let trimmeddata = await TrimOutputForRestore(stringoutputfromrsync).trimmeddata {
-                return trimmeddata.map { filename in
-                    RsyncOutputData(record: filename)
-                }
-            }
-        }
-        return []
-    }
-
     // After a restore, present files
     @concurrent
     nonisolated func createoutputafterrestore(_ stringoutputfromrsync: [String]?) async -> [RsyncOutputData] {

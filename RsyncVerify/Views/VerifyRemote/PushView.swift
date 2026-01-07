@@ -88,7 +88,7 @@ struct PushView: View {
     // This is a normal synchronize task, dry-run = true
     func pushProcessTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) {
         DispatchQueue.main.async {
-            if (stringoutputfromrsync?.count ?? 0) > 20, let stringoutputfromrsync {
+            if (stringoutputfromrsync?.count ?? 0) > 17, let stringoutputfromrsync {
                 let suboutput = PrepareOutputFromRsync().prepareOutputFromRsync(stringoutputfromrsync)
                 pushremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: suboutput,
                                                           config: config)
@@ -96,32 +96,12 @@ struct PushView: View {
                 pushremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: stringoutputfromrsync,
                                                           config: config)
             }
-
-            // Rsync output push
-            pushorpull.rsyncpush = stringoutputfromrsync
-            pushorpull.rsyncpushmax = (stringoutputfromrsync?.count ?? 0) - reduceestimatedcount
-            if pushorpull.rsyncpushmax < 0 {
-                pushorpull.rsyncpushmax = 0
-            }
         }
-
-        if isadjusted {
-            // Adjust output
-            pushorpull.adjustoutput()
-            let adjustedPush = pushorpull.adjustedpush
-            Task.detached { [adjustedPush] in
-                async let outPush = ActorCreateOutputforView().createOutputForView(adjustedPush)
-                let push = await outPush
-                await MainActor.run {
-                    pushremotedatanumbers?.outputfromrsync = push
-                }
-            }
-        } else {
-            Task.detached { [stringoutputfromrsync] in
-                let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-                await MainActor.run { pushremotedatanumbers?.outputfromrsync = out }
-            }
+        Task.detached { [stringoutputfromrsync] in
+            let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
+            await MainActor.run { pushremotedatanumbers?.outputfromrsync = out }
         }
+        
         // Final cleanup
         activeStreamingProcess = nil
         streamingHandlers = nil

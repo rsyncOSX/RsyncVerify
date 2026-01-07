@@ -62,10 +62,17 @@ struct VerifyRemoteView: View {
             NavigationStack(path: $verifypath) {
                 if let pullremotedatanumbers, let pushremotedatanumbers {
                     HStack {
-                        DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
-                            .padding(10)
-                        DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
-                            .padding(10)
+                        VStack(alignment: .leading) {
+                            Text("PUSH")
+                            DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
+                                .padding(10)
+                        }
+                            
+                        VStack(alignment: .leading) {
+                            Text("PULL")
+                            DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
+                                .padding(10)
+                        }
                     }
                 } else {
                     ConfigurationsTableDataView(selecteduuids: $selecteduuids,
@@ -136,7 +143,8 @@ struct VerifyRemoteView: View {
                 if let config = rsyncUIdata.configurations?[index] {
                     PushView(pushorpull: $pushorpull,
                              verifypath: $verifypath,
-                             pushpullcommand: $pushpullcommand, pushremotedatanumbers: $pushremotedatanumbers,
+                             pushpullcommand: $pushpullcommand,
+                             pushremotedatanumbers: $pushremotedatanumbers,
                              config: config,
                              isadjusted: isadjusted)
                 }
@@ -147,7 +155,9 @@ struct VerifyRemoteView: View {
                 if let config = rsyncUIdata.configurations?[index] {
                     PullView(pushorpull: $pushorpull,
                              verifypath: $verifypath,
-                             pushpullcommand: $pushpullcommand, pullremotedatanumbers: $pullremotedatanumbers,
+                             pushpullcommand: $pushpullcommand,
+                             pullremotedatanumbers: $pullremotedatanumbers,
+                             pushremotedatanumbers: $pushremotedatanumbers,
                              config: config,
                              isadjusted: isadjusted)
                 }
@@ -155,3 +165,36 @@ struct VerifyRemoteView: View {
         }
     }
 }
+
+/*
+ 
+ // Rsync output push
+ pushorpull.rsyncpush = stringoutputfromrsync
+ pushorpull.rsyncpushmax = (stringoutputfromrsync?.count ?? 0) - reduceestimatedcount
+ if pushorpull.rsyncpushmax < 0 {
+     pushorpull.rsyncpushmax = 0
+ }
+ 
+ // Rsync output pull
+ pushorpull.rsyncpull = stringoutputfromrsync
+ pushorpull.rsyncpullmax = (stringoutputfromrsync?.count ?? 0) - reduceestimatedcount
+ if pushorpull.rsyncpullmax < 0 {
+     pushorpull.rsyncpullmax = 0
+ }
+ 
+ if isadjusted {
+     // Adjust output
+     pushorpull.adjustoutput()
+     let adjustedPull = pushorpull.adjustedpull
+     let adjustedPush = pushorpull.adjustedpush
+     
+     Task.detached { [adjustedPull, adjustedPush] in
+         async let outPull = ActorCreateOutputforView().createOutputForView(adjustedPull)
+         async let outPush = ActorCreateOutputforView().createOutputForView(adjustedPush)
+         let (pull, push) = await (outPull, outPush)
+         await MainActor.run {
+             pullremotedatanumbers?.outputfromrsync = pull
+             pushremotedatanumbers?.outputfromrsync = push
+         }
+     }
+ */

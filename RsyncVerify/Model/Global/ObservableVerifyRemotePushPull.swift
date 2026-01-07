@@ -21,13 +21,13 @@ final class ObservableVerifyRemotePushPull {
     func adjustoutput() {
         if var pullremote = rsyncpull,
            var pushremote = rsyncpush {
-            guard pullremote.count > 17, pushremote.count > 17 else { return }
+            guard pullremote.count > 15, pushremote.count > 15 else { return }
 
             pullremote.removeFirst()
             pushremote.removeFirst()
 
-            pullremote.removeLast(17)
-            pushremote.removeLast(17)
+            pullremote.removeLast(15)
+            pushremote.removeLast(15)
 
             // Pull data <<--
             var setpullremote = Set(pullremote.compactMap { row in

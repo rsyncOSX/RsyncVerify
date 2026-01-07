@@ -15,6 +15,8 @@ struct PullView: View {
     @Binding var pushpullcommand: PushPullCommand
     // Pull data from remote, adjusted
     @Binding var pullremotedatanumbers: RemoteDataNumbers?
+    // Push data to remote, adjusted
+    @Binding var pushremotedatanumbers: RemoteDataNumbers?
     // If aborted
     @State private var isaborted: Bool = false
 
@@ -89,7 +91,7 @@ struct PullView: View {
 
     func pullProcessTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) {
         DispatchQueue.main.async {
-            if (stringoutputfromrsync?.count ?? 0) > 20, let stringoutputfromrsync {
+            if (stringoutputfromrsync?.count ?? 0) > 17, let stringoutputfromrsync {
                 let suboutput = PrepareOutputFromRsync().prepareOutputFromRsync(stringoutputfromrsync)
                 pullremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: suboutput,
                                                           config: config)
@@ -98,29 +100,10 @@ struct PullView: View {
                                                           config: config)
             }
             guard isaborted == false else { return }
-            // Rsync output pull
-            pushorpull.rsyncpull = stringoutputfromrsync
-            pushorpull.rsyncpullmax = (stringoutputfromrsync?.count ?? 0) - reduceestimatedcount
-            if pushorpull.rsyncpullmax < 0 {
-                pushorpull.rsyncpullmax = 0
-            }
         }
-        if isadjusted {
-            // Adjust output
-            pushorpull.adjustoutput()
-            let adjustedPull = pushorpull.adjustedpull
-            Task.detached { [adjustedPull] in
-                async let outPull = ActorCreateOutputforView().createOutputForView(adjustedPull)
-                let pull = await outPull
-                await MainActor.run {
-                    pullremotedatanumbers?.outputfromrsync = pull
-                }
-            }
-        } else {
-            Task.detached { [stringoutputfromrsync] in
-                let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-                await MainActor.run { pullremotedatanumbers?.outputfromrsync = out }
-            }
+        Task.detached { [stringoutputfromrsync] in
+            let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
+            await MainActor.run { pullremotedatanumbers?.outputfromrsync = out }
         }
         // Release current streaming before next task
         activeStreamingProcess = nil

@@ -50,6 +50,8 @@ struct VerifyRemoteView: View {
             }
             .frame(width: 180)
             .padding([.bottom, .top, .trailing], 7)
+            
+            Spacer()
 
         } detail: {
             NavigationStack(path: $verifypath) {

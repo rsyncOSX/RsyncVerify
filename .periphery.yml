@@ -1,7 +1,5 @@
-project: RsyncUI.xcodeproj
+project: RsyncVerify.xcodeproj
 retain_objc_accessible: true
 retain_public: true
 schemes:
-- RsyncUI
-index_exclude:
-- RsyncUI/Model/Utils/yudpsocket/ytcpsocket.swift
+- RsyncVerify

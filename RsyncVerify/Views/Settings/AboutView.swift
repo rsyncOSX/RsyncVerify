@@ -108,11 +108,6 @@ struct AboutView: View {
                 }
             }
         }
-        .task {
-            if SharedReference.shared.newversion {
-                urlstring = await ActorGetversionofRsyncVerify().downloadlinkofrsyncui() ?? ""
-            }
-        }
         .formStyle(.grouped)
     }
 

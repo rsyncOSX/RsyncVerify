@@ -231,7 +231,6 @@ struct ConfigurationsTableDataMainView: View {
                     break
                 }
             }
-            WriteSynchronizeConfigurationJSON(rsyncUIdata.profile, rsyncUIdata.configurations)
             selecteduuids.removeAll()
         }
     }

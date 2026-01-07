@@ -43,7 +43,6 @@ struct ListofTasksMainView: View {
                 "Delete \(selecteduuids.count) configurations",
                 isPresented: $confirmdelete) {
                     Button("Delete") {
-                        delete()
                         confirmdelete = false
                     }
             }
@@ -70,16 +69,5 @@ struct ListofTasksMainView: View {
                     }
                 }
             }
-    }
-
-    func delete() {
-        if let configurations = rsyncUIdata.configurations {
-            let deleteconfigurations =
-                UpdateConfigurations(profile: rsyncUIdata.profile,
-                                     configurations: configurations)
-            deleteconfigurations.deleteconfigurations(selecteduuids)
-            selecteduuids.removeAll()
-            rsyncUIdata.configurations = deleteconfigurations.configurations
-        }
     }
 }

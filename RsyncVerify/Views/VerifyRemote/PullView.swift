@@ -13,9 +13,8 @@ struct PullView: View {
     @Binding var pushorpull: ObservableVerifyRemotePushPull
     @Binding var verifypath: [Verify]
     @Binding var pushpullcommand: PushPullCommand
-
     // Pull data from remote, adjusted
-    @State private var pullremotedatanumbers: RemoteDataNumbers?
+    @Binding var pullremotedatanumbers: RemoteDataNumbers?
     // If aborted
     @State private var isaborted: Bool = false
 
@@ -51,6 +50,8 @@ struct PullView: View {
                         }
                     }
                 }
+            } else {
+                ProgressView()
             }
         }
         .onAppear {
@@ -121,7 +122,7 @@ struct PullView: View {
             }
         }
         if isadjusted {
-            // Adjust both outputs
+            // Adjust output
             pushorpull.adjustoutput()
             let adjustedPull = pushorpull.adjustedpull
             Task.detached { [adjustedPull] in

@@ -35,6 +35,10 @@ struct VerifyRemoteView: View {
     @State private var verifypath: [Verify] = []
     // Show Inspector view
     @State var showinspector: Bool = false
+    // Pull data from remote, adjusted
+    @State private var pullremotedatanumbers: RemoteDataNumbers?
+    // Push data to remote, adjusted
+    @State private var pushremotedatanumbers: RemoteDataNumbers?
 
     var body: some View {
         NavigationSplitView {
@@ -56,20 +60,29 @@ struct VerifyRemoteView: View {
 
         } detail: {
             NavigationStack(path: $verifypath) {
-                ConfigurationsTableDataView(selecteduuids: $selecteduuids,
-                                            configurations: rsyncUIdata.configurations)
-                    .onChange(of: selecteduuids) {
-                        if let configurations = rsyncUIdata.configurations {
-                            if let index = configurations.firstIndex(where: { $0.id == selecteduuids.first }) {
-                                guard selectedconfig?.task != SharedReference.shared.halted else { return }
-                                selectedconfig = configurations[index]
-                                showinspector = true
-                            } else {
-                                selectedconfig = nil
-                                showinspector = false
+                if let pullremotedatanumbers, let pushremotedatanumbers {
+                    HStack {
+                        DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
+                            .padding(10)
+                        DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
+                            .padding(10)
+                    }
+                } else {
+                    ConfigurationsTableDataView(selecteduuids: $selecteduuids,
+                                                configurations: rsyncUIdata.configurations)
+                        .onChange(of: selecteduuids) {
+                            if let configurations = rsyncUIdata.configurations {
+                                if let index = configurations.firstIndex(where: { $0.id == selecteduuids.first }) {
+                                    guard selectedconfig?.task != SharedReference.shared.halted else { return }
+                                    selectedconfig = configurations[index]
+                                    showinspector = true
+                                } else {
+                                    selectedconfig = nil
+                                    showinspector = false
+                                }
                             }
                         }
-                    }
+                }
             }.navigationDestination(for: Verify.self) { which in
                 makeView(view: which.task)
             }
@@ -135,7 +148,7 @@ struct VerifyRemoteView: View {
                 if let config = rsyncUIdata.configurations?[index] {
                     PushView(pushorpull: $pushorpull,
                              verifypath: $verifypath,
-                             pushpullcommand: $pushpullcommand,
+                             pushpullcommand: $pushpullcommand, pushremotedatanumbers: $pushremotedatanumbers,
                              config: config,
                              isadjusted: isadjusted)
                 }
@@ -146,7 +159,7 @@ struct VerifyRemoteView: View {
                 if let config = rsyncUIdata.configurations?[index] {
                     PullView(pushorpull: $pushorpull,
                              verifypath: $verifypath,
-                             pushpullcommand: $pushpullcommand,
+                             pushpullcommand: $pushpullcommand, pullremotedatanumbers: $pullremotedatanumbers,
                              config: config,
                              isadjusted: isadjusted)
                 }

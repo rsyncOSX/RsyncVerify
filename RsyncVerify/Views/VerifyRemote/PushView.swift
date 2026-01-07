@@ -14,7 +14,7 @@ struct PushView: View {
     @Binding var verifypath: [Verify]
     @Binding var pushpullcommand: PushPullCommand
     // Push data to remote, adjusted
-    @State private var pushremotedatanumbers: RemoteDataNumbers?
+    @Binding var pushremotedatanumbers: RemoteDataNumbers?
     // If aborted
     @State private var isaborted: Bool = false
 
@@ -50,6 +50,8 @@ struct PushView: View {
                         }
                     }
                 }
+            } else {
+                ProgressView()
             }
         }
         .onAppear {
@@ -120,7 +122,7 @@ struct PushView: View {
         }
 
         if isadjusted {
-            // Adjust both outputs
+            // Adjust output
             pushorpull.adjustoutput()
             let adjustedPush = pushorpull.adjustedpush
             Task.detached { [adjustedPush] in

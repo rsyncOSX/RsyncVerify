@@ -8,23 +8,6 @@
 import Foundation
 import SwiftUI
 
-struct FixedTag: ViewModifier {
-    var width: CGFloat = 0
-    var alignment: Alignment = .leading
-    func body(content: Content) -> some View {
-        content
-            .frame(minWidth: width, idealWidth: width, maxWidth: width,
-                   minHeight: nil, idealHeight: nil, maxHeight: nil,
-                   alignment: alignment)
-            .lineLimit(1)
-    }
-
-    init(_ setwidth: CGFloat, _ setalignment: Alignment) {
-        width = setwidth
-        alignment = setalignment
-    }
-}
-
 struct ToggleViewDefault: View {
     @Environment(\.colorScheme) var colorScheme
     private var mytext: String?
@@ -85,48 +68,3 @@ struct DismissafterMessageView: View {
     }
 }
 
-struct MessageView: View {
-    @Environment(\.colorScheme) var colorScheme
-
-    private var mytext: String
-    private var textsize: Font
-
-    var body: some View {
-        if colorScheme == .dark {
-            ZStack {
-                RoundedRectangle(cornerRadius: 15).fill(Color.gray.opacity(0.3))
-                Text(mytext)
-                    // .font(.caption2)
-                    .font(textsize)
-                    .foregroundColor(Color.green)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .allowsTightening(false)
-                    .minimumScaleFactor(0.5)
-            }
-            .frame(height: 30, alignment: .center)
-            .background(RoundedRectangle(cornerRadius: 25).stroke(Color.gray, lineWidth: 1))
-            .padding()
-        } else {
-            ZStack {
-                RoundedRectangle(cornerRadius: 15).fill(Color.gray.opacity(0.3))
-                Text(mytext)
-                    // .font(.caption2)
-                    .font(textsize)
-                    .foregroundColor(Color.blue)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .allowsTightening(false)
-                    .minimumScaleFactor(0.5)
-            }
-            .frame(height: 30, alignment: .center)
-            .background(RoundedRectangle(cornerRadius: 25).stroke(Color.gray, lineWidth: 1))
-            .padding()
-        }
-    }
-
-    init(mytext: String, size: Font) {
-        self.mytext = mytext
-        textsize = size
-    }
-}

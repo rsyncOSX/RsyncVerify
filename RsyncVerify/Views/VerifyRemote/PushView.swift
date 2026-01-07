@@ -27,33 +27,17 @@ struct PushView: View {
     let reduceestimatedcount: Int = 15
 
     var body: some View {
-        VStack {
-            if let pushremotedatanumbers {
-                VStack {
-                    Text(" \(config.backupID)")
-                        .font(.title2)
+        HStack {
+            ProgressView()
 
-                    HStack {
-                        VStack {
-                            ConditionalGlassButton(
-                                systemImage: "arrowshape.right.fill",
-                                helpText: "Push local"
-                            ) {
-                                pushpullcommand = .pushLocal
-                                verifypath.removeAll()
-                                verifypath.append(Verify(task: .executenpushpullview(configID: config.id)))
-                            }
-                            .padding(10)
-
-                            DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
-                                .padding(10)
-                        }
-                    }
-                }
-            } else {
-                ProgressView()
-            }
+            Text("Estimating \(config.backupID) PUSH, please wait ...")
+                .font(.title2)
         }
+        .padding()
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
         .onAppear {
             pushRemote(config: config)
         }
@@ -141,6 +125,8 @@ struct PushView: View {
         // Final cleanup
         activeStreamingProcess = nil
         streamingHandlers = nil
+        verifypath.removeAll()
+        verifypath.append(Verify(task: .pullview(configID: config.id)))
     }
 
     func abort() {

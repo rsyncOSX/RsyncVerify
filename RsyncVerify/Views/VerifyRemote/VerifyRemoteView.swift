@@ -107,18 +107,6 @@ struct VerifyRemoteView: View {
                     verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
                 }
                 .padding(10)
-
-                ConditionalGlassButton(
-                    systemImage: "arrow.left",
-                    helpText: "Verify selected"
-                ) {
-                    guard let selectedconfig else { return }
-                    guard selectedtaskishalted == false else { return }
-                    guard SharedReference.shared.process == nil else { return }
-                    showinspector = false
-                    verifypath.append(Verify(task: .pullview(configID: selectedconfig.id)))
-                }
-                .padding(10)
             }
 
             Toggle("Adjust output", isOn: $isadjusted)

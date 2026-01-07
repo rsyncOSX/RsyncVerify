@@ -27,33 +27,17 @@ struct PullView: View {
     let reduceestimatedcount: Int = 15
 
     var body: some View {
-        VStack {
-            if let pullremotedatanumbers {
-                VStack {
-                    Text(" \(config.backupID)")
-                        .font(.title2)
+        HStack {
+            ProgressView()
 
-                    HStack {
-                        VStack {
-                            ConditionalGlassButton(
-                                systemImage: "arrowshape.left.fill",
-                                helpText: "Pull remote"
-                            ) {
-                                pushpullcommand = .pullRemote
-                                verifypath.removeAll()
-                                verifypath.append(Verify(task: .executenpushpullview(configID: config.id)))
-                            }
-                            .padding(10)
-
-                            DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
-                                .padding(10)
-                        }
-                    }
-                }
-            } else {
-                ProgressView()
-            }
+            Text("Estimating \(config.backupID) PULL, please wait ...")
+                .font(.title2)
         }
+        .padding()
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
         .onAppear {
             pullRemote(config: config)
         }
@@ -141,6 +125,7 @@ struct PullView: View {
         // Release current streaming before next task
         activeStreamingProcess = nil
         streamingHandlers = nil
+        verifypath.removeAll()
     }
 
     func abort() {

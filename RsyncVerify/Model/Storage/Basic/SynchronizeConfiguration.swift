@@ -5,37 +5,6 @@
 
 import Foundation
 
-enum NumDayofweek: Int {
-    case monday = 2
-    case tuesday = 3
-    case wednesday = 4
-    case thursday = 5
-    case friday = 6
-    case saturday = 7
-    case sunday = 1
-}
-
-enum StringDayofweek: String, CaseIterable, Identifiable, CustomStringConvertible {
-    case monday
-    case tuesday
-    case wednesday
-    case thursday
-    case friday
-    case saturday
-    case sunday
-
-    var id: String { rawValue }
-    var description: String { rawValue.localizedLowercase }
-}
-
-enum PlanSnapshots: String, CaseIterable, Identifiable, CustomStringConvertible {
-    case every // keepallselcteddayofweek
-    case last // islastSelectedDayinMonth
-
-    var id: String { rawValue }
-    var description: String { rawValue.localizedLowercase }
-}
-
 struct SynchronizeConfiguration: Identifiable, Codable {
     var id = UUID()
     var hiddenID: Int
@@ -92,12 +61,6 @@ struct SynchronizeConfiguration: Identifiable, Codable {
             sshport = datasshport
         }
         task = data.task ?? ""
-        // For snapshots
-        if let snapshotnum = data.snapshotnum {
-            self.snapshotnum = snapshotnum
-            snapdayoffweek = data.snapdayoffweek ?? StringDayofweek.sunday.rawValue
-            snaplast = data.snaplast ?? 1
-        }
         // Last run of task
         dateRun = data.dateRun
         halted = data.halted ?? 0

@@ -9,8 +9,9 @@ import OSLog
 import SwiftUI
 
 enum DestinationVerifyView: Hashable {
-    case pushpullview(configID: SynchronizeConfiguration.ID)
     case executenpushpullview(configID: SynchronizeConfiguration.ID)
+    case pushview(configID: SynchronizeConfiguration.ID)
+    case pullview(configID: SynchronizeConfiguration.ID)
 }
 
 struct Verify: Hashable, Identifiable {
@@ -50,7 +51,7 @@ struct VerifyRemoteView: View {
             }
             .frame(width: 180)
             .padding([.bottom, .top, .trailing], 7)
-            
+
             Spacer()
 
         } detail: {
@@ -83,14 +84,26 @@ struct VerifyRemoteView: View {
         VStack(alignment: .center) {
             if selecteduuids.count == 1, selectedconfig != nil {
                 ConditionalGlassButton(
-                    systemImage: "arrow.up",
+                    systemImage: "arrow.right",
                     helpText: "Verify selected"
                 ) {
                     guard let selectedconfig else { return }
                     guard selectedtaskishalted == false else { return }
                     guard SharedReference.shared.process == nil else { return }
                     showinspector = false
-                    verifypath.append(Verify(task: .pushpullview(configID: selectedconfig.id)))
+                    verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+                }
+                .padding(10)
+
+                ConditionalGlassButton(
+                    systemImage: "arrow.left",
+                    helpText: "Verify selected"
+                ) {
+                    guard let selectedconfig else { return }
+                    guard selectedtaskishalted == false else { return }
+                    guard SharedReference.shared.process == nil else { return }
+                    showinspector = false
+                    verifypath.append(Verify(task: .pullview(configID: selectedconfig.id)))
                 }
                 .padding(10)
             }
@@ -116,14 +129,26 @@ struct VerifyRemoteView: View {
                                         config: config)
                 }
             }
-        case let .pushpullview(configuuid):
+
+        case let .pushview(configuuid):
             if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }) {
                 if let config = rsyncUIdata.configurations?[index] {
-                    PushPullView(pushorpull: $pushorpull,
-                                 verifypath: $verifypath,
-                                 pushpullcommand: $pushpullcommand,
-                                 config: config,
-                                 isadjusted: isadjusted)
+                    PushView(pushorpull: $pushorpull,
+                             verifypath: $verifypath,
+                             pushpullcommand: $pushpullcommand,
+                             config: config,
+                             isadjusted: isadjusted)
+                }
+            }
+
+        case let .pullview(configuuid):
+            if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }) {
+                if let config = rsyncUIdata.configurations?[index] {
+                    PullView(pushorpull: $pushorpull,
+                             verifypath: $verifypath,
+                             pushpullcommand: $pushpullcommand,
+                             config: config,
+                             isadjusted: isadjusted)
                 }
             }
         }

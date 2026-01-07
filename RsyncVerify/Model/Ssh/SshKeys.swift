@@ -59,9 +59,7 @@ final class SshKeys {
         }
     }
 
-    func processTermination(stringoutputfromrsync: [String]?, _: Bool) {
-        
-    }
+    func processTermination(stringoutputfromrsync _: [String]?, _: Bool) {}
 
     init() {
         let sshport = SharedReference.shared.sshport

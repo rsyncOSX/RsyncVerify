@@ -76,16 +76,7 @@ struct Logsettings: View {
                                 SharedReference.shared.confirmexecute = logsettings.confirmexecute
                             }
                     }
-
-                    if toggleobservemountedvolumes {
-                        DismissafterMessageView(dismissafter: 2, mytext: "Please restart RsyncVerify to take effect")
-                    }
-
-                    if toggleusetwotablesInspector {
-                        DismissafterMessageView(dismissafter: 2, mytext: "Please restart RsyncVerify to take effect")
-                    }
                 }
-
         }
         .formStyle(.grouped)
     }

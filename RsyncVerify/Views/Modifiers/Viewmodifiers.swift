@@ -67,4 +67,3 @@ struct DismissafterMessageView: View {
         self.mytext = mytext
     }
 }
-

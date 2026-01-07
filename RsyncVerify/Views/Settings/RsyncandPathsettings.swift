@@ -56,7 +56,6 @@ struct RsyncandPathsettings: View {
                 .fontWeight(.bold)) {
                     setmarkdays
                 }
-
         }
         .formStyle(.grouped)
     }

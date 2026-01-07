@@ -25,7 +25,7 @@ struct RsyncVerifyApp: App {
                     NSApplication.shared.terminate(nil)
                 }
         }
-        
+
         Settings {
             SidebarSettingsView()
         }

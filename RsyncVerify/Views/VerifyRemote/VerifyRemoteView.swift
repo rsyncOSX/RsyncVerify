@@ -56,22 +56,40 @@ struct VerifyRemoteView: View {
             .frame(width: 180)
             .padding([.bottom, .top, .trailing], 7)
 
-            ConditionalGlassButton(
-                systemImage: "trash.fill",
-                helpText: "Reset"
-            ) {
-                pullremotedatanumbers = nil
-                pushremotedatanumbers = nil
+            Toggle("Adjust output", isOn: $isadjusted)
+                .toggleStyle(.switch)
+                .padding(10)
+
+            HStack {
+                ConditionalGlassButton(
+                    systemImage: "trash.fill",
+                    helpText: "Reset"
+                ) {
+                    pullremotedatanumbers = nil
+                    pushremotedatanumbers = nil
+                }
+                .padding(10)
+
+                ConditionalGlassButton(
+                    systemImage: "arrow.up",
+                    helpText: "Verify selected"
+                ) {
+                    guard let selectedconfig else { return }
+                    guard selectedtaskishalted == false else { return }
+                    guard SharedReference.shared.process == nil else { return }
+                    showinspector = false
+                    verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+                }
+                .padding(10)
+                .disabled(selecteduuids.count != 1 && selectedconfig == nil)
             }
-            .padding(10)
 
             Spacer()
 
         } detail: {
             NavigationStack(path: $verifypath) {
                 if pullremotedatanumbers?.outputfromrsync != nil,
-                   pushremotedatanumbers?.outputfromrsync != nil,
-                   isadjusted == false {
+                   pushremotedatanumbers?.outputfromrsync != nil {
                     HStack {
                         VStack(alignment: .leading) {
                             Text("PUSH")
@@ -101,40 +119,6 @@ struct VerifyRemoteView: View {
                             }
                         }
                     }
-                } else
-                if pullremotedatanumbers?.outputfromrsync != nil,
-                   pushremotedatanumbers?.outputfromrsync != nil,
-                   isadjusted == true {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("PUSH")
-                                .font(.title)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                                .padding(10)
-                            if let pushremotedatanumbers {
-                                DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
-                                    .padding(10)
-                            }
-                        }
-
-                        VStack(alignment: .leading) {
-                            Text("PULL")
-                                .font(.title)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                                .padding(10)
-                            if let pullremotedatanumbers {
-                                DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
-                                    .padding(10)
-                            }
-                        }
-                    }
-
                 } else {
                     ConfigurationsTableDataView(selecteduuids: $selecteduuids,
                                                 configurations: rsyncUIdata.configurations)
@@ -143,10 +127,10 @@ struct VerifyRemoteView: View {
                                 if let index = configurations.firstIndex(where: { $0.id == selecteduuids.first }) {
                                     guard selectedconfig?.task != SharedReference.shared.halted else { return }
                                     selectedconfig = configurations[index]
-                                    showinspector = true
+                                    // showinspector = true
                                 } else {
                                     selectedconfig = nil
-                                    showinspector = false
+                                    // showinspector = false
                                 }
                             }
                         }
@@ -230,10 +214,10 @@ struct VerifyRemoteView: View {
             if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }) {
                 if let config = rsyncUIdata.configurations?[index] {
                     /*
-                    ExecutePushPullView(pushorpull: $pushorpull,
-                                        pushpullcommand: $pushpullcommand,
-                                        config: config)
-                     */
+                     ExecutePushPullView(pushorpull: $pushorpull,
+                                         pushpullcommand: $pushpullcommand,
+                                         config: config)
+                      */
                     Text("test")
                 }
             }
@@ -258,14 +242,13 @@ struct VerifyRemoteView: View {
                              pushremotedatanumbers: $pushremotedatanumbers,
                              config: config,
                              isadjusted: isadjusted)
-                    .onDisappear {
-                        if isadjusted {
-                            prepareadjustedoutput()
+                        .onDisappear {
+                            if isadjusted {
+                                prepareadjustedoutput()
+                            }
                         }
-                    }
                 }
             }
         }
     }
 }
-

@@ -90,25 +90,31 @@ struct PullView: View {
     }
 
     func pullProcessTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) {
-        DispatchQueue.main.async {
-            if (stringoutputfromrsync?.count ?? 0) > 17, let stringoutputfromrsync {
-                let suboutput = PrepareOutputFromRsync().prepareOutputFromRsync(stringoutputfromrsync)
-                pullremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: suboutput,
-                                                          config: config)
-            } else {
-                pullremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: stringoutputfromrsync,
-                                                          config: config)
-            }
+        Task { @MainActor in
             guard isaborted == false else { return }
-        }
-        Task.detached { [stringoutputfromrsync] in
+
+            // Process output
+            let processedOutput: [String]? = if let output = stringoutputfromrsync, output.count > 17 {
+                PrepareOutputFromRsync().prepareOutputFromRsync(output)
+            } else {
+                stringoutputfromrsync
+            }
+
+            // Create data numbers
+            pullremotedatanumbers = RemoteDataNumbers(
+                stringoutputfromrsync: processedOutput,
+                config: config
+            )
+
+            // Create output for view
             let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-            await MainActor.run { pullremotedatanumbers?.outputfromrsync = out }
+            pullremotedatanumbers?.outputfromrsync = out
+
+            // Release current streaming before next task
+            activeStreamingProcess = nil
+            streamingHandlers = nil
+            verifypath.removeAll()
         }
-        // Release current streaming before next task
-        activeStreamingProcess = nil
-        streamingHandlers = nil
-        verifypath.removeAll()
     }
 
     func abort() {

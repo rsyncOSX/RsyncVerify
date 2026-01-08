@@ -87,26 +87,32 @@ struct PushView: View {
 
     // This is a normal synchronize task, dry-run = true
     func pushProcessTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) {
-        DispatchQueue.main.async {
-            if (stringoutputfromrsync?.count ?? 0) > 17, let stringoutputfromrsync {
-                let suboutput = PrepareOutputFromRsync().prepareOutputFromRsync(stringoutputfromrsync)
-                pushremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: suboutput,
-                                                          config: config)
+        Task { @MainActor in
+            guard isaborted == false else { return }
+
+            // Process output
+            let processedOutput: [String]? = if let output = stringoutputfromrsync, output.count > 17 {
+                PrepareOutputFromRsync().prepareOutputFromRsync(output)
             } else {
-                pushremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: stringoutputfromrsync,
-                                                          config: config)
+                stringoutputfromrsync
             }
-        }
-        Task.detached { [stringoutputfromrsync] in
+
+            // Create data numbers
+            pushremotedatanumbers = RemoteDataNumbers(
+                stringoutputfromrsync: processedOutput,
+                config: config
+            )
+
+            // Create output for view
             let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-            await MainActor.run { pushremotedatanumbers?.outputfromrsync = out }
+            pushremotedatanumbers?.outputfromrsync = out
+
+            // Cleanup after all async work completes
+            activeStreamingProcess = nil
+            streamingHandlers = nil
+            verifypath.removeAll()
+            verifypath.append(Verify(task: .pullview(configID: config.id)))
         }
-        
-        // Final cleanup
-        activeStreamingProcess = nil
-        streamingHandlers = nil
-        verifypath.removeAll()
-        verifypath.append(Verify(task: .pullview(configID: config.id)))
     }
 
     func abort() {

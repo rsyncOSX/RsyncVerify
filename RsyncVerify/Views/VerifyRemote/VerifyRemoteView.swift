@@ -55,7 +55,7 @@ struct VerifyRemoteView: View {
             }
             .frame(width: 180)
             .padding([.bottom, .top, .trailing], 7)
-            
+
             ConditionalGlassButton(
                 systemImage: "trash.fill",
                 helpText: "Reset"
@@ -79,11 +79,11 @@ struct VerifyRemoteView: View {
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
                                 .padding(10)
-                            
+
                             DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
                                 .padding(10)
                         }
-                            
+
                         VStack(alignment: .leading) {
                             Text("PULL")
                                 .font(.title)
@@ -189,27 +189,27 @@ struct VerifyRemoteView: View {
 }
 
 /*
- 
+
  // Rsync output push
  pushorpull.rsyncpush = stringoutputfromrsync
  pushorpull.rsyncpushmax = (stringoutputfromrsync?.count ?? 0) - reduceestimatedcount
  if pushorpull.rsyncpushmax < 0 {
      pushorpull.rsyncpushmax = 0
  }
- 
+
  // Rsync output pull
  pushorpull.rsyncpull = stringoutputfromrsync
  pushorpull.rsyncpullmax = (stringoutputfromrsync?.count ?? 0) - reduceestimatedcount
  if pushorpull.rsyncpullmax < 0 {
      pushorpull.rsyncpullmax = 0
  }
- 
+
  if isadjusted {
      // Adjust output
      pushorpull.adjustoutput()
      let adjustedPull = pushorpull.adjustedpull
      let adjustedPush = pushorpull.adjustedpush
-     
+
      Task.detached { [adjustedPull, adjustedPush] in
          async let outPull = ActorCreateOutputforView().createOutputForView(adjustedPull)
          async let outPush = ActorCreateOutputforView().createOutputForView(adjustedPush)

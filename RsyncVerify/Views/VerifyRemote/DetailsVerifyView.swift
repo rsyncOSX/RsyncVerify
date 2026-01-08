@@ -37,6 +37,5 @@ struct DetailsVerifyView: View {
                 }
             }
         }
-        
     }
 }

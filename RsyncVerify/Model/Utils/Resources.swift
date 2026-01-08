@@ -2,6 +2,7 @@
 //  Resources.swift
 //  RsyncVerify
 //
+// swiftlint:disable line_length
 
 import Foundation
 
@@ -29,3 +30,5 @@ struct Resources {
         }
     }
 }
+
+// swiftlint:enable line_length

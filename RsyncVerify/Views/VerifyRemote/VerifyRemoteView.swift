@@ -55,6 +55,15 @@ struct VerifyRemoteView: View {
             }
             .frame(width: 180)
             .padding([.bottom, .top, .trailing], 7)
+            
+            ConditionalGlassButton(
+                systemImage: "trash.fill",
+                helpText: "Reset"
+            ) {
+                pullremotedatanumbers = nil
+                pushremotedatanumbers = nil
+            }
+            .padding(10)
 
             Spacer()
 
@@ -64,12 +73,25 @@ struct VerifyRemoteView: View {
                     HStack {
                         VStack(alignment: .leading) {
                             Text("PUSH")
+                                .font(.title)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                                .padding(10)
+                            
                             DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
                                 .padding(10)
                         }
                             
                         VStack(alignment: .leading) {
                             Text("PULL")
+                                .font(.title)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                                .padding(10)
                             DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
                                 .padding(10)
                         }
@@ -104,7 +126,7 @@ struct VerifyRemoteView: View {
         VStack(alignment: .center) {
             if selecteduuids.count == 1, selectedconfig != nil {
                 ConditionalGlassButton(
-                    systemImage: "arrow.right",
+                    systemImage: "arrow.up",
                     helpText: "Verify selected"
                 ) {
                     guard let selectedconfig else { return }

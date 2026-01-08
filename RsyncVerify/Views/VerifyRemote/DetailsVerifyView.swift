@@ -11,29 +11,32 @@ struct DetailsVerifyView: View {
     let remotedatanumbers: RemoteDataNumbers
 
     var body: some View {
-        Table(remotedatanumbers.outputfromrsync ?? []) {
-            TableColumn("Output from rsync" + ": \(remotedatanumbers.outputfromrsync?.count ?? 0) rows") { data in
-                if data.record.contains("*deleting") {
-                    HStack {
-                        Text("delete").foregroundColor(.red)
-                        Text(data.record)
-                    }
+        if let records = remotedatanumbers.outputfromrsync {
+            Table(records) {
+                TableColumn("Output from rsync" + ": \(records.count) rows") { data in
+                    if data.record.contains("*deleting") {
+                        HStack {
+                            Text("delete").foregroundColor(.red)
+                            Text(data.record)
+                        }
 
-                } else if data.record.contains("<") {
-                    HStack {
-                        Text("push").foregroundColor(.blue)
-                        Text(data.record)
-                    }
+                    } else if data.record.contains("<") {
+                        HStack {
+                            Text("push").foregroundColor(.blue)
+                            Text(data.record)
+                        }
 
-                } else if data.record.contains(">") {
-                    HStack {
-                        Text("pull").foregroundColor(.green)
+                    } else if data.record.contains(">") {
+                        HStack {
+                            Text("pull").foregroundColor(.green)
+                            Text(data.record)
+                        }
+                    } else {
                         Text(data.record)
                     }
-                } else {
-                    Text(data.record)
                 }
             }
         }
+        
     }
 }

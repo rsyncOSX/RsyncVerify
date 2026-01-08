@@ -33,9 +33,7 @@ struct CreateStreamingHandlers {
             propagateError: { error in
                 SharedReference.shared.errorobject?.alert(error: error)
             },
-            logger: { _, _ in },
             checkForErrorInRsyncOutput: SharedReference.shared.checkforerrorinrsyncoutput,
-            rsyncVersion3: SharedReference.shared.rsyncversion3,
             environment: MyEnvironment()?.environment
         )
     }
@@ -69,9 +67,7 @@ struct CreateStreamingHandlers {
             propagateError: { error in
                 SharedReference.shared.errorobject?.alert(error: error)
             },
-            logger: { _, _ in },
             checkForErrorInRsyncOutput: SharedReference.shared.checkforerrorinrsyncoutput,
-            rsyncVersion3: SharedReference.shared.rsyncversion3,
             environment: MyEnvironment()?.environment
         )
     }

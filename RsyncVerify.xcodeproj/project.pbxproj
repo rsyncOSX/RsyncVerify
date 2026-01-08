@@ -448,7 +448,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rsyncOSX/RsyncProcessStreaming";
 			requirement = {
-				branch = main;
+				branch = "main-refactor-deepseek";
 				kind = branch;
 			};
 		};

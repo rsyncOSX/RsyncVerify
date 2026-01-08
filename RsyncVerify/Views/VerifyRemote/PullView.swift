@@ -10,7 +10,6 @@ import RsyncProcessStreaming
 import SwiftUI
 
 struct PullView: View {
-    @Binding var pushorpull: ObservableVerifyRemotePushPull
     @Binding var verifypath: [Verify]
     @Binding var pushpullcommand: PushPullCommand
     // Pull data from remote, adjusted

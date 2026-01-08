@@ -69,7 +69,9 @@ struct VerifyRemoteView: View {
 
         } detail: {
             NavigationStack(path: $verifypath) {
-                if let pullremotedatanumbers, let pushremotedatanumbers {
+                if pullremotedatanumbers?.outputfromrsync != nil,
+                   pushremotedatanumbers?.outputfromrsync != nil,
+                   isadjusted == false {
                     HStack {
                         VStack(alignment: .leading) {
                             Text("PUSH")
@@ -79,9 +81,10 @@ struct VerifyRemoteView: View {
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
                                 .padding(10)
-
-                            DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
-                                .padding(10)
+                            if let pushremotedatanumbers {
+                                DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
+                                    .padding(10)
+                            }
                         }
 
                         VStack(alignment: .leading) {
@@ -92,10 +95,46 @@ struct VerifyRemoteView: View {
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
                                 .padding(10)
-                            DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
-                                .padding(10)
+                            if let pullremotedatanumbers {
+                                DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
+                                    .padding(10)
+                            }
                         }
                     }
+                } else
+                if pullremotedatanumbers?.outputfromrsync != nil,
+                   pushremotedatanumbers?.outputfromrsync != nil,
+                   isadjusted == true {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("PUSH")
+                                .font(.title)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                                .padding(10)
+                            if let pushremotedatanumbers {
+                                DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
+                                    .padding(10)
+                            }
+                        }
+
+                        VStack(alignment: .leading) {
+                            Text("PULL")
+                                .font(.title)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                                .padding(10)
+                            if let pullremotedatanumbers {
+                                DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
+                                    .padding(10)
+                            }
+                        }
+                    }
+
                 } else {
                     ConfigurationsTableDataView(selecteduuids: $selecteduuids,
                                                 configurations: rsyncUIdata.configurations)
@@ -148,7 +187,43 @@ struct VerifyRemoteView: View {
         )
     }
 
-    @MainActor @ViewBuilder
+    @MainActor func prepareadjustedoutput() {
+        Task.detached { [pushremotedatanumbers, pullremotedatanumbers] in
+            // Capture raw outputs locally to avoid sending non-Sendable state across actors
+            let reduceestimatedcount = 15
+
+            let pushRaw = pushremotedatanumbers?.preparedoutputfromrsync
+            let pullRaw = pullremotedatanumbers?.preparedoutputfromrsync
+
+            var rsyncpushmax = (pushRaw?.count ?? 0) - reduceestimatedcount
+            if rsyncpushmax < 0 { rsyncpushmax = 0 }
+
+            var rsyncpullmax = (pullRaw?.count ?? 0) - reduceestimatedcount
+            if rsyncpullmax < 0 { rsyncpullmax = 0 }
+
+            // Create a local instance to perform adjustments off the main actor without touching view state
+            let local = ObservableVerifyRemotePushPull()
+            local.outputrsyncpushraw = pushRaw
+            local.outputrsyncpullraw = pullRaw
+            local.rsyncpushmax = rsyncpushmax
+            local.rsyncpullmax = rsyncpullmax
+
+            await local.adjustoutput()
+            let adjustedPull = local.adjustedpull
+            let adjustedPush = local.adjustedpush
+
+            async let outPull = ActorCreateOutputforView().createOutputForView(adjustedPull)
+            async let outPush = ActorCreateOutputforView().createOutputForView(adjustedPush)
+            let (pull, push) = await (outPull, outPush)
+
+            await MainActor.run {
+                self.pullremotedatanumbers?.outputfromrsync = pull
+                self.pushremotedatanumbers?.outputfromrsync = push
+            }
+        }
+    }
+
+    @ViewBuilder
     func makeView(view: DestinationVerifyView) -> some View {
         switch view {
         case let .executenpushpullview(configuuid):
@@ -163,8 +238,7 @@ struct VerifyRemoteView: View {
         case let .pushview(configuuid):
             if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }) {
                 if let config = rsyncUIdata.configurations?[index] {
-                    PushView(pushorpull: $pushorpull,
-                             verifypath: $verifypath,
+                    PushView(verifypath: $verifypath,
                              pushpullcommand: $pushpullcommand,
                              pushremotedatanumbers: $pushremotedatanumbers,
                              config: config,
@@ -175,48 +249,20 @@ struct VerifyRemoteView: View {
         case let .pullview(configuuid):
             if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }) {
                 if let config = rsyncUIdata.configurations?[index] {
-                    PullView(pushorpull: $pushorpull,
-                             verifypath: $verifypath,
+                    PullView(verifypath: $verifypath,
                              pushpullcommand: $pushpullcommand,
                              pullremotedatanumbers: $pullremotedatanumbers,
                              pushremotedatanumbers: $pushremotedatanumbers,
                              config: config,
                              isadjusted: isadjusted)
+                    .onDisappear {
+                        if isadjusted {
+                            prepareadjustedoutput()
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-/*
-
- // Rsync output push
- pushorpull.rsyncpush = stringoutputfromrsync
- pushorpull.rsyncpushmax = (stringoutputfromrsync?.count ?? 0) - reduceestimatedcount
- if pushorpull.rsyncpushmax < 0 {
-     pushorpull.rsyncpushmax = 0
- }
-
- // Rsync output pull
- pushorpull.rsyncpull = stringoutputfromrsync
- pushorpull.rsyncpullmax = (stringoutputfromrsync?.count ?? 0) - reduceestimatedcount
- if pushorpull.rsyncpullmax < 0 {
-     pushorpull.rsyncpullmax = 0
- }
-
- if isadjusted {
-     // Adjust output
-     pushorpull.adjustoutput()
-     let adjustedPull = pushorpull.adjustedpull
-     let adjustedPush = pushorpull.adjustedpush
-
-     Task.detached { [adjustedPull, adjustedPush] in
-         async let outPull = ActorCreateOutputforView().createOutputForView(adjustedPull)
-         async let outPush = ActorCreateOutputforView().createOutputForView(adjustedPush)
-         let (pull, push) = await (outPull, outPush)
-         await MainActor.run {
-             pullremotedatanumbers?.outputfromrsync = pull
-             pushremotedatanumbers?.outputfromrsync = push
-         }
-     }
- */

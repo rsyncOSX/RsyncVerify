@@ -12,15 +12,17 @@ final class ObservableVerifyRemotePushPull {
     @ObservationIgnored var adjustedpull: Set<String>?
     @ObservationIgnored var adjustedpush: Set<String>?
 
-    @ObservationIgnored var rsyncpull: [String]?
-    @ObservationIgnored var rsyncpush: [String]?
+    @ObservationIgnored var outputrsyncpullraw: [String]?
+    @ObservationIgnored var outputrsyncpushraw: [String]?
 
     @ObservationIgnored var rsyncpullmax: Int = 0
     @ObservationIgnored var rsyncpushmax: Int = 0
 
-    func adjustoutput() {
-        if var pullremote = rsyncpull,
-           var pushremote = rsyncpush {
+    @concurrent
+    nonisolated func adjustoutput() async {
+        Logger.process.debugMessageOnly("ObservableVerifyRemotePushPull: adjustoutput()")
+        if var pullremote = outputrsyncpullraw,
+           var pushremote = outputrsyncpushraw {
             guard pullremote.count > 15, pushremote.count > 15 else { return }
 
             pullremote.removeFirst()

@@ -102,11 +102,14 @@ struct PushView: View {
                 stringoutputfromrsync: processedOutput,
                 config: config
             )
-
-            // Create output for view
-            let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-            pushremotedatanumbers?.outputfromrsync = out
-
+            if isadjusted == false {
+                // Create output for view
+                let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
+                pushremotedatanumbers?.outputfromrsync = out
+            } else {
+                pushremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: stringoutputfromrsync,
+                                                          config: config)
+            }
             // Cleanup after all async work completes
             activeStreamingProcess = nil
             streamingHandlers = nil

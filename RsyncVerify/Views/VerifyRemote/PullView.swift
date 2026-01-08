@@ -105,11 +105,14 @@ struct PullView: View {
                 stringoutputfromrsync: processedOutput,
                 config: config
             )
-
-            // Create output for view
-            let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-            pullremotedatanumbers?.outputfromrsync = out
-
+            if isadjusted == false {
+                // Create output for view
+                let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
+                pullremotedatanumbers?.outputfromrsync = out
+            } else {
+                pullremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: stringoutputfromrsync,
+                                                          config: config)
+            }
             // Release current streaming before next task
             activeStreamingProcess = nil
             streamingHandlers = nil

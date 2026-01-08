@@ -31,16 +31,4 @@ actor ActorCreateOutputforView {
         }
         return []
     }
-
-    // After a restore, present files
-    @concurrent
-    nonisolated func createoutputafterrestore(_ stringoutputfromrsync: [String]?) async -> [RsyncOutputData] {
-        Logger.process.debugThreadOnly("ActorCreateOutputforView: createoutputafterrestore()")
-        if let stringoutputfromrsync {
-            return stringoutputfromrsync.map { filename in
-                RsyncOutputData(record: filename)
-            }
-        }
-        return []
-    }
 }

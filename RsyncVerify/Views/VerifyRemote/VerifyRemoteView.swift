@@ -30,7 +30,7 @@ struct VerifyRemoteView: View {
     // Adjusted output rsync
     @State private var isadjusted: Bool = false
     // Decide push or pull
-    @State private var pushorpull = ObservableVerifyRemotePushPull()
+    // @State private var pushorpull = ObservableVerifyRemotePushPull()
     @State private var pushpullcommand = PushPullCommand.pushLocal
     @State private var verifypath: [Verify] = []
     // Show Inspector view
@@ -229,9 +229,12 @@ struct VerifyRemoteView: View {
         case let .executenpushpullview(configuuid):
             if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }) {
                 if let config = rsyncUIdata.configurations?[index] {
+                    /*
                     ExecutePushPullView(pushorpull: $pushorpull,
                                         pushpullcommand: $pushpullcommand,
                                         config: config)
+                     */
+                    Text("test")
                 }
             }
 

@@ -20,17 +20,16 @@ final class ObservableVerifyRemotePushPull {
 
     @concurrent
     nonisolated func adjustoutput() async {
-        Logger.process.debugMessageOnly("ObservableVerifyRemotePushPull: adjustoutput()")
+        Logger.process.debugThreadOnly("ObservableVerifyRemotePushPull: adjustoutput()")
         if var pullremote = outputrsyncpullraw,
            var pushremote = outputrsyncpushraw {
             guard pullremote.count > 15, pushremote.count > 15 else { return }
-
+            
             pullremote.removeFirst()
             pushremote.removeFirst()
-
             pullremote.removeLast(15)
             pushremote.removeLast(15)
-
+            
             // Pull data <<--
             var setpullremote = Set(pullremote.compactMap { row in
                 row.hasSuffix("/") == false ? row : nil

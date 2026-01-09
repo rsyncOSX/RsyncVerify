@@ -83,6 +83,16 @@ struct VerifyRemoteView: View {
                 .padding(10)
                 .disabled(selecteduuids.count != 1 && selectedconfig == nil)
             }
+            
+            ConditionalGlassButton(
+                systemImage: "figure.run",
+                helpText: "Excute"
+            ) {
+                guard let selectedconfig else { return }
+                verifypath.append(Verify(task: .executenpushpullview(configID: selectedconfig.id)))
+            }
+            .padding(10)
+            .disabled(selecteduuids.count != 1 && selectedconfig == nil)
 
             Spacer()
 

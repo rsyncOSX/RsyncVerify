@@ -232,7 +232,7 @@ struct ExecutePushPullView: View {
     }
 
     func processTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             showprogressview = false
 
             let lines = stringoutputfromrsync?.count ?? 0
@@ -248,15 +248,14 @@ struct ExecutePushPullView: View {
                 remotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: stringoutputfromrsync,
                                                       config: config)
             }
-        }
 
-        Task.detached { [stringoutputfromrsync] in
             let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-            await MainActor.run { remotedatanumbers?.outputfromrsync = out }
+            remotedatanumbers?.outputfromrsync = out
+
+            // Release streaming references to avoid retain cycles
+            activeStreamingProcess = nil
+            streamingHandlers = nil
         }
-        // Release streaming references to avoid retain cycles
-        activeStreamingProcess = nil
-        streamingHandlers = nil
     }
 
     func fileHandler(count: Int) {

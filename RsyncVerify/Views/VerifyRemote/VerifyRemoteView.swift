@@ -213,12 +213,11 @@ struct VerifyRemoteView: View {
         case let .executenpushpullview(configuuid):
             if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }) {
                 if let config = rsyncUIdata.configurations?[index] {
-                    /*
-                     ExecutePushPullView(pushorpull: $pushorpull,
-                                         pushpullcommand: $pushpullcommand,
-                                         config: config)
-                      */
-                    Text("test")
+                    ExecutePushPullView(pushpullcommand: $pushpullcommand,
+                                        config: config,
+                                        pushorpullbool: pushorpull(),
+                                        rsyncpullmax: pullremotedatanumbers?.maxpushpull ?? 0,
+                                        rsyncpushmax: pushremotedatanumbers?.maxpushpull ?? 0)
                 }
             }
 
@@ -250,5 +249,12 @@ struct VerifyRemoteView: View {
                 }
             }
         }
+    }
+
+    func pushorpull() -> Bool {
+        if let pushcount = pushremotedatanumbers?.maxpushpull, let pullcount = pullremotedatanumbers?.maxpushpull {
+            return pushcount > pullcount
+        }
+        return false
     }
 }

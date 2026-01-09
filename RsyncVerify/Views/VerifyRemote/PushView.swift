@@ -109,6 +109,9 @@ struct PushView: View {
                 pushremotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: stringoutputfromrsync,
                                                           config: config)
             }
+            if let count = pushremotedatanumbers?.outputfromrsync?.count, count > 0 {
+                pushremotedatanumbers?.maxpushpull = Double(count)
+            }
             // Cleanup after all async work completes
             activeStreamingProcess = nil
             streamingHandlers = nil

@@ -113,6 +113,9 @@ struct PullView: View {
                                                           config: config)
             }
             // Release current streaming before next task
+            if let count = pullremotedatanumbers?.outputfromrsync?.count, count > 0 {
+                pullremotedatanumbers?.maxpushpull = Double(count)
+            }
             activeStreamingProcess = nil
             streamingHandlers = nil
             verifypath.removeAll()

@@ -32,6 +32,8 @@ struct RemoteDataNumbers: Identifiable, Hashable {
     var offsiteCatalog: String = ""
     var offsiteServer: String = ""
     var backupID: String = ""
+    // Max for push and pull
+    var maxpushpull: Double = 0
 
     // Detailed output used in Views, allocated as part of process termination estimate
     var outputfromrsync: [RsyncOutputData]?

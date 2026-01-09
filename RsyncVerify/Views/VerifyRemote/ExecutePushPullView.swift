@@ -9,8 +9,6 @@ import RsyncProcessStreaming
 import SwiftUI
 
 struct ExecutePushPullView: View {
-    @Binding var pushorpull: ObservableVerifyRemotePushPull
-
     @State private var showprogressview = false
     @State private var remotedatanumbers: RemoteDataNumbers?
     @Binding var pushpullcommand: PushPullCommand
@@ -28,15 +26,18 @@ struct ExecutePushPullView: View {
     @State private var showinspector: Bool = true
 
     let config: SynchronizeConfiguration
+    let pushorpullbool: Bool // True if pull data
+    let rsyncpullmax: Double
+    let rsyncpushmax: Double
 
     var body: some View {
         HStack {
             if let remotedatanumbers {
                 DetailsView(remotedatanumbers: remotedatanumbers)
             } else {
-                if pushorpull.rsyncpullmax > 0, pushpullcommand == .pullRemote {
+                if pushorpullbool, pushpullcommand == .pullRemote {
                     HStack {
-                        let totalPull = Double(pushorpull.rsyncpullmax)
+                        let totalPull = Double(rsyncpullmax)
                         ProgressView("",
                                      value: min(Swift.max(progress, 0), totalPull),
                                      total: totalPull)
@@ -45,7 +46,7 @@ struct ExecutePushPullView: View {
                             .padding(10)
 
                         HStack {
-                            Text("\(Int(pushorpull.rsyncpullmax)): ")
+                            Text("\(Int(rsyncpullmax)): ")
                                 .padding()
                                 .font(.title2)
 
@@ -62,9 +63,9 @@ struct ExecutePushPullView: View {
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
 
-                } else if pushorpull.rsyncpushmax > 0, pushpullcommand == .pushLocal {
+                } else if pushorpullbool == false, pushpullcommand == .pushLocal {
                     HStack {
-                        let totalPush = Double(pushorpull.rsyncpushmax)
+                        let totalPush = Double(rsyncpushmax)
                         ProgressView("",
                                      value: min(Swift.max(progress, 0), totalPush),
                                      total: totalPush)
@@ -73,7 +74,7 @@ struct ExecutePushPullView: View {
                             .padding(10)
 
                         HStack {
-                            Text("\(Int(pushorpull.rsyncpushmax)): ")
+                            Text("\(Int(rsyncpushmax)): ")
                                 .padding()
                                 .font(.title2)
 

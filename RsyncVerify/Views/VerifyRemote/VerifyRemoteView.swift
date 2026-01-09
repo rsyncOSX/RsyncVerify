@@ -98,7 +98,7 @@ struct VerifyRemoteView: View {
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
-                                .padding(10)
+                                .padding()
                             if let pushremotedatanumbers {
                                 DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
                                     .padding(10)
@@ -112,7 +112,7 @@ struct VerifyRemoteView: View {
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
-                                .padding(10)
+                                .padding()
                             if let pullremotedatanumbers {
                                 DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
                                     .padding(10)

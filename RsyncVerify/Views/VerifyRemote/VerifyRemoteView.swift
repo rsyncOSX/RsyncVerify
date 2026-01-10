@@ -56,44 +56,6 @@ struct VerifyRemoteView: View {
             .frame(width: 180)
             .padding([.bottom, .top, .trailing], 7)
 
-            Toggle("Adjust output", isOn: $isadjusted)
-                .toggleStyle(.switch)
-                .padding(10)
-
-            HStack {
-                ConditionalGlassButton(
-                    systemImage: "trash.fill",
-                    helpText: "Reset"
-                ) {
-                    pullremotedatanumbers = nil
-                    pushremotedatanumbers = nil
-                }
-                .padding(10)
-
-                ConditionalGlassButton(
-                    systemImage: "arrow.up",
-                    helpText: "Verify selected"
-                ) {
-                    guard let selectedconfig else { return }
-                    guard selectedtaskishalted == false else { return }
-                    guard SharedReference.shared.process == nil else { return }
-                    showinspector = false
-                    verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
-                }
-                .padding(10)
-                .disabled(selecteduuids.count != 1 && selectedconfig == nil)
-            }
-            
-            ConditionalGlassButton(
-                systemImage: "figure.run",
-                helpText: "Excute"
-            ) {
-                guard let selectedconfig else { return }
-                verifypath.append(Verify(task: .executenpushpullview(configID: selectedconfig.id)))
-            }
-            .padding(10)
-            .disabled(selecteduuids.count != 1 && selectedconfig == nil)
-
             Spacer()
 
         } detail: {
@@ -102,13 +64,15 @@ struct VerifyRemoteView: View {
                    pushremotedatanumbers?.outputfromrsync != nil {
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("PUSH")
-                                .font(.title)
+                            Text("Push")
+                                .font(.title2)
+                                .padding()
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
-                                .padding()
+                                .padding(10)
+                            
                             if let pushremotedatanumbers {
                                 DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
                                     .padding(10)
@@ -116,13 +80,15 @@ struct VerifyRemoteView: View {
                         }
 
                         VStack(alignment: .leading) {
-                            Text("PULL")
-                                .font(.title)
+                            Text("Pull")
+                                .font(.title2)
+                                .padding()
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
-                                .padding()
+                                .padding(10)
+                            
                             if let pullremotedatanumbers {
                                 DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
                                     .padding(10)
@@ -137,10 +103,10 @@ struct VerifyRemoteView: View {
                                 if let index = configurations.firstIndex(where: { $0.id == selecteduuids.first }) {
                                     guard selectedconfig?.task != SharedReference.shared.halted else { return }
                                     selectedconfig = configurations[index]
-                                    // showinspector = true
+                                    showinspector = true
                                 } else {
                                     selectedconfig = nil
-                                    // showinspector = false
+                                    showinspector = false
                                 }
                             }
                         }
@@ -153,24 +119,65 @@ struct VerifyRemoteView: View {
             inspectorView
                 .inspectorColumnWidth(min: 100, ideal: 200, max: 300)
         }
+        .toolbar { toolbarContent }
+    }
+
+    @ToolbarContentBuilder
+    var toolbarContent: some ToolbarContent {
+        
+        ToolbarItem {
+            ConditionalGlassButton(
+                systemImage: "arrow.up",
+                helpText: "Verify selected"
+            ) {
+                guard let selectedconfig else { return }
+                guard selectedtaskishalted == false else { return }
+                guard SharedReference.shared.process == nil else { return }
+                showinspector = false
+                verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+            }
+            .disabled(selecteduuids.count != 1 && selectedconfig == nil)
+        }
+
+        ToolbarItem {
+            Spacer()
+        }
+        
+        ToolbarItem {
+            ConditionalGlassButton(
+                systemImage: "figure.run",
+                helpText: "Excute"
+            ) {
+                guard let selectedconfig else { return }
+                verifypath.append(Verify(task: .executenpushpullview(configID: selectedconfig.id)))
+            }
+            .disabled(selecteduuids.count != 1 && selectedconfig == nil)
+        }
+        
+        ToolbarItem {
+            Spacer()
+        }
+        
+        ToolbarItem {
+            ConditionalGlassButton(
+                systemImage: "trash.fill",
+                helpText: "Reset"
+            ) {
+                pullremotedatanumbers = nil
+                pushremotedatanumbers = nil
+                selecteduuids.removeAll()
+                selectedconfig = nil
+            }
+        }
+
+        ToolbarItem {
+            Spacer()
+        }
     }
 
     var inspectorView: some View {
         VStack(alignment: .center) {
-            if selecteduuids.count == 1, selectedconfig != nil {
-                ConditionalGlassButton(
-                    systemImage: "arrow.up",
-                    helpText: "Verify selected"
-                ) {
-                    guard let selectedconfig else { return }
-                    guard selectedtaskishalted == false else { return }
-                    guard SharedReference.shared.process == nil else { return }
-                    showinspector = false
-                    verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
-                }
-                .padding(10)
-            }
-
+    
             Toggle("Adjust output", isOn: $isadjusted)
                 .toggleStyle(.switch)
                 .padding(10)

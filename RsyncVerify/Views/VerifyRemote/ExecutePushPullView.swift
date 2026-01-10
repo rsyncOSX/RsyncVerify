@@ -23,8 +23,6 @@ struct ExecutePushPullView: View {
     @State private var streamingHandlers: RsyncProcessStreaming.ProcessHandlers?
     @State private var activeStreamingProcess: RsyncProcessStreaming.RsyncProcess?
 
-    @State private var showinspector: Bool = true
-
     let config: SynchronizeConfiguration
     let pushorpullbool: Bool // True if pull data
     let rsyncpullmax: Double
@@ -35,64 +33,66 @@ struct ExecutePushPullView: View {
             if let remotedatanumbers {
                 DetailsView(remotedatanumbers: remotedatanumbers)
             } else {
-                if pushorpullbool, pushpullcommand == .pullRemote {
-                    HStack {
-                        let totalPull = Double(rsyncpullmax)
-                        ProgressView("",
-                                     value: min(Swift.max(progress, 0), totalPull),
-                                     total: totalPull)
-                            .frame(alignment: .center)
-                            .frame(width: 180)
-                            .padding(10)
+                HStack {
+                    executeview
 
+                    if pushorpullbool, pushpullcommand == .pullRemote {
                         HStack {
-                            Text("\(Int(rsyncpullmax)): ")
-                                .padding()
-                                .font(.title2)
+                            let totalPull = Double(rsyncpullmax)
+                            ProgressView("",
+                                         value: min(Swift.max(progress, 0), totalPull),
+                                         total: totalPull)
+                                .frame(alignment: .center)
+                                .frame(width: 180)
+                                .padding(10)
 
-                            Text("\(Int(progress))")
-                                .padding()
-                                .font(.title2)
-                                .contentTransition(.numericText(countsDown: false))
-                                .animation(.default, value: progress)
-                        }
-                        .padding(10)
-                    }
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
+                            HStack {
+                                Text("\(Int(rsyncpullmax)): ")
+                                    .padding()
+                                    .font(.title2)
 
-                } else if pushorpullbool == false, pushpullcommand == .pushLocal {
-                    HStack {
-                        let totalPush = Double(rsyncpushmax)
-                        ProgressView("",
-                                     value: min(Swift.max(progress, 0), totalPush),
-                                     total: totalPush)
-                            .frame(alignment: .center)
-                            .frame(width: 180)
+                                Text("\(Int(progress))")
+                                    .padding()
+                                    .font(.title2)
+                                    .contentTransition(.numericText(countsDown: false))
+                                    .animation(.default, value: progress)
+                            }
                             .padding(10)
-
-                        HStack {
-                            Text("\(Int(rsyncpushmax)): ")
-                                .padding()
-                                .font(.title2)
-
-                            Text("\(Int(progress))")
-                                .padding()
-                                .font(.title2)
-                                .contentTransition(.numericText(countsDown: false))
-                                .animation(.default, value: progress)
                         }
-                        .padding(10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+
+                    } else if pushorpullbool == false, pushpullcommand == .pushLocal {
+                        HStack {
+                            let totalPush = Double(rsyncpushmax)
+                            ProgressView("",
+                                         value: min(Swift.max(progress, 0), totalPush),
+                                         total: totalPush)
+                                .frame(alignment: .center)
+                                .frame(width: 180)
+                                .padding(10)
+
+                            HStack {
+                                Text("\(Int(rsyncpushmax)): ")
+                                    .padding()
+                                    .font(.title2)
+
+                                Text("\(Int(progress))")
+                                    .padding()
+                                    .font(.title2)
+                                    .contentTransition(.numericText(countsDown: false))
+                                    .animation(.default, value: progress)
+                            }
+                            .padding(10)
+                        }
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
                     }
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
                 }
-
-                Spacer()
             }
         }
         .toolbar(content: {
@@ -105,13 +105,9 @@ struct ExecutePushPullView: View {
                 }
             }
         })
-        .inspector(isPresented: $showinspector) {
-            inspectorView
-                .inspectorColumnWidth(min: 400, ideal: 500, max: 600)
-        }
     }
 
-    var inspectorView: some View {
+    var executeview: some View {
         VStack {
             HStack {
                 if pushpullcommand == .pushLocal {

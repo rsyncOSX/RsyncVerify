@@ -35,58 +35,22 @@ struct ExecutePushPullView: View {
             } else {
                 HStack {
                     executeview
-
-                    if pushorpullbool, pushpullcommand == .pullRemote {
-                        HStack {
-                            let totalPull = Double(rsyncpullmax)
-                            ProgressView("",
-                                         value: min(Swift.max(progress, 0), totalPull),
-                                         total: totalPull)
-                                .frame(alignment: .center)
-                                .frame(width: 180)
-                                .padding(10)
-
-                            HStack {
-                                Text("\(Int(rsyncpullmax)): ")
-                                    .padding()
-                                    .font(.title2)
-
-                                Text("\(Int(progress))")
-                                    .padding()
-                                    .font(.title2)
-                                    .contentTransition(.numericText(countsDown: false))
-                                    .animation(.default, value: progress)
-                            }
-                            .padding(10)
-                        }
+                    
+                    if pushpullcommand == .pullRemote {
+                        let totalPull = Double(rsyncpullmax)
+                        SynchronizeProgressView(max: Double(rsyncpullmax),
+                                                progress: min(Swift.max(progress, 0), totalPull),
+                                                statusText: "Push data")
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                         )
 
-                    } else if pushorpullbool == false, pushpullcommand == .pushLocal {
-                        HStack {
-                            let totalPush = Double(rsyncpushmax)
-                            ProgressView("",
-                                         value: min(Swift.max(progress, 0), totalPush),
-                                         total: totalPush)
-                                .frame(alignment: .center)
-                                .frame(width: 180)
-                                .padding(10)
-
-                            HStack {
-                                Text("\(Int(rsyncpushmax)): ")
-                                    .padding()
-                                    .font(.title2)
-
-                                Text("\(Int(progress))")
-                                    .padding()
-                                    .font(.title2)
-                                    .contentTransition(.numericText(countsDown: false))
-                                    .animation(.default, value: progress)
-                            }
-                            .padding(10)
-                        }
+                    } else {
+                        let totalPush = Double(rsyncpushmax)
+                        SynchronizeProgressView(max: Double(rsyncpushmax),
+                                                progress: min(Swift.max(progress, 0), totalPush),
+                                                statusText: "Pull data")
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)

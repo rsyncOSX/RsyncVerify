@@ -72,7 +72,7 @@ struct VerifyRemoteView: View {
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
                                 .padding(10)
-                            
+
                             if let pushremotedatanumbers {
                                 DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
                                     .padding(10)
@@ -88,7 +88,7 @@ struct VerifyRemoteView: View {
                                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                 )
                                 .padding(10)
-                            
+
                             if let pullremotedatanumbers {
                                 DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
                                     .padding(10)
@@ -124,7 +124,6 @@ struct VerifyRemoteView: View {
 
     @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
-        
         ToolbarItem {
             ConditionalGlassButton(
                 systemImage: "arrow.up",
@@ -142,7 +141,7 @@ struct VerifyRemoteView: View {
         ToolbarItem {
             Spacer()
         }
-        
+
         ToolbarItem {
             ConditionalGlassButton(
                 systemImage: "figure.run",
@@ -153,11 +152,11 @@ struct VerifyRemoteView: View {
             }
             .disabled(selecteduuids.count != 1 && selectedconfig == nil)
         }
-        
+
         ToolbarItem {
             Spacer()
         }
-        
+
         ToolbarItem {
             ConditionalGlassButton(
                 systemImage: "trash.fill",
@@ -177,7 +176,6 @@ struct VerifyRemoteView: View {
 
     var inspectorView: some View {
         VStack(alignment: .center) {
-    
             Toggle("Adjust output", isOn: $isadjusted)
                 .toggleStyle(.switch)
                 .padding(10)

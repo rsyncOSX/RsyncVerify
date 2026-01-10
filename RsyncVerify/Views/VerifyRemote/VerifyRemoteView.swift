@@ -42,9 +42,7 @@ struct VerifyRemoteView: View {
 
     var body: some View {
         NavigationSplitView {
-            // Only show profile picker if there are other profiles
-            // Id default only, do not show profile picker
-
+            
             Picker("", selection: $selectedprofileID) {
                 Text("Default")
                     .tag(nil as ProfilesnamesRecord.ID?)
@@ -57,6 +55,13 @@ struct VerifyRemoteView: View {
             .padding([.bottom, .top, .trailing], 7)
 
             Spacer()
+            
+            if SharedReference.shared.rsyncversion3 {
+                MessageView(mytext: SharedReference.shared.rsyncversionshort ?? "", size: .caption2)
+            } else {
+                MessageView(mytext: "Not applicable\nfor openrsync", size: .caption2)
+            }
+            
 
         } detail: {
             NavigationStack(path: $verifypath) {
@@ -135,7 +140,7 @@ struct VerifyRemoteView: View {
                 showinspector = false
                 verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
             }
-            .disabled(selecteduuids.count != 1 && selectedconfig == nil)
+            .disabled(disabledpushpull)
         }
 
         ToolbarItem {
@@ -150,7 +155,7 @@ struct VerifyRemoteView: View {
                 guard let selectedconfig else { return }
                 verifypath.append(Verify(task: .executenpushpullview(configID: selectedconfig.id)))
             }
-            .disabled(selecteduuids.count != 1 && selectedconfig == nil)
+            .disabled(disabledpushpull)
         }
 
         ToolbarItem {
@@ -271,5 +276,11 @@ struct VerifyRemoteView: View {
             return pushcount > pullcount
         }
         return false
+    }
+    
+    var disabledpushpull: Bool {
+        guard let selectedconfig else { return true}
+        guard SharedReference.shared.rsyncversion3 else { return true}
+        return selectedconfig.offsiteServer.isEmpty
     }
 }

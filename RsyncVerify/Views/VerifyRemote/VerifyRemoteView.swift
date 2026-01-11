@@ -29,7 +29,8 @@ struct VerifyRemoteView: View {
     @State private var selectedtaskishalted: Bool = false
     // Adjusted output rsync
     @State private var isadjusted: Bool = false
-    // Decide push or pull
+    // Tag output or not
+    @State private var istagged: Bool = false
     // @State private var pushorpull = ObservableVerifyRemotePushPull()
     @State private var pushpullcommand = PushPullCommand.pushLocal
     @State private var verifypath: [Verify] = []
@@ -76,7 +77,8 @@ struct VerifyRemoteView: View {
                                 .padding(10)
 
                             if let pushremotedatanumbers {
-                                DetailsVerifyView(remotedatanumbers: pushremotedatanumbers)
+                                DetailsVerifyView(remotedatanumbers: pushremotedatanumbers,
+                                                  istagged: istagged)
                                     .padding(10)
                             }
                         }
@@ -92,7 +94,8 @@ struct VerifyRemoteView: View {
                                 .padding(10)
 
                             if let pullremotedatanumbers {
-                                DetailsVerifyView(remotedatanumbers: pullremotedatanumbers)
+                                DetailsVerifyView(remotedatanumbers: pullremotedatanumbers,
+                                                  istagged: istagged)
                                     .padding(10)
                             }
                         }
@@ -185,6 +188,10 @@ struct VerifyRemoteView: View {
     var inspectorView: some View {
         VStack(alignment: .center) {
             Toggle("Adjust output", isOn: $isadjusted)
+                .toggleStyle(.switch)
+                .padding(10)
+            
+            Toggle("Tag output", isOn: $istagged)
                 .toggleStyle(.switch)
                 .padding(10)
         }

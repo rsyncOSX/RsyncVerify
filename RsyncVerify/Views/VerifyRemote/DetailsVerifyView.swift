@@ -9,33 +9,43 @@ import SwiftUI
 
 struct DetailsVerifyView: View {
     let remotedatanumbers: RemoteDataNumbers
+    let istagged: Bool
 
     var body: some View {
         if let records = remotedatanumbers.outputfromrsync {
-            Table(records) {
-                TableColumn("Output from rsync" + ": \(records.count) rows") { data in
-                    if data.record.contains("*deleting") {
-                        HStack {
-                            Text("delete").foregroundColor(.red)
-                            Text(data.record)
-                        }
+            if istagged {
+                Table(records) {
+                    TableColumn("Output from rsync" + ": \(records.count) rows") { data in
+                        if data.record.contains("*deleting") {
+                            HStack {
+                                Text("delete").foregroundColor(.red)
+                                Text(data.record)
+                            }
 
-                    } else if data.record.contains("<") {
-                        HStack {
-                            Text("push").foregroundColor(.blue)
-                            Text(data.record)
-                        }
+                        } else if data.record.contains("<") {
+                            HStack {
+                                Text("push").foregroundColor(.blue)
+                                Text(data.record)
+                            }
 
-                    } else if data.record.contains(">") {
-                        HStack {
-                            Text("pull").foregroundColor(.green)
+                        } else if data.record.contains(">") {
+                            HStack {
+                                Text("pull").foregroundColor(.green)
+                                Text(data.record)
+                            }
+                        } else {
                             Text(data.record)
                         }
-                    } else {
+                    }
+                }
+            } else {
+                Table(records) {
+                    TableColumn("Output from rsync" + ": \(records.count) rows") { data in
                         Text(data.record)
                     }
                 }
             }
+            
         }
     }
 }

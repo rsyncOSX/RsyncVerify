@@ -30,8 +30,9 @@ actor ActorLogToFile {
     // MARK: - Helper Properties
 
     private var logfileURL: URL? {
-        guard let fullpathmacserial = homepath?.fullpathmacserial else { return nil }
-        return URL(fileURLWithPath: fullpathmacserial).appendingPathComponent(logName)
+        let fmanager = FileManager.default
+        let homeURL = fmanager.homeDirectoryForCurrentUser
+        return homeURL.appendingPathComponent(logName)
     }
 
     // MARK: - Public Methods

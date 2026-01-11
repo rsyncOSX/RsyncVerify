@@ -84,8 +84,10 @@ struct VerifyRemoteView: View {
                                     helpText: "Save Push data to file"
                                 ) {
                                     Task {
-                                        Logger.process.debugMessageOnly("Execute: LOGGING details to logfile")
-                                        _ = await ActorLogToFile().logOutput("rsync", output)
+                                        if let output = pushremotedatanumbers?.preparedoutputfromrsync {
+                                            Logger.process.debugMessageOnly("Execute: LOGGING details to logfile")
+                                            _ = await ActorLogToFile().logOutput("PUSH output", output)
+                                        }
                                     }
                                 }
                             }
@@ -113,8 +115,10 @@ struct VerifyRemoteView: View {
                                     helpText: "Save Pull data to file"
                                 ) {
                                     Task {
-                                        Logger.process.debugMessageOnly("Execute: LOGGING details to logfile")
-                                        _ = await ActorLogToFile().logOutput("rsync", output)
+                                        if let output = pullremotedatanumbers?.preparedoutputfromrsync {
+                                            Logger.process.debugMessageOnly("Execute: LOGGING details to logfile")
+                                            _ = await ActorLogToFile().logOutput("PULL output", output)
+                                        }
                                     }
                                 }
                             }

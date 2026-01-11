@@ -121,7 +121,7 @@ struct VerifyRemoteView: View {
                                         }
                                     }
                                 }
-                                
+
                                 ConditionalGlassButton(
                                     systemImage: "square.and.arrow.down.fill",
                                     helpText: "Analyze output from Pull"

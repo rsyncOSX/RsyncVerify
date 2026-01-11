@@ -142,13 +142,13 @@ actor ActorLogToFile {
         let logEntry = header + output + "\n"
         await writeloggfile(logEntry, false)
     }
-    
+
     //  var outputfromrsync: [RsyncOutputData]?
-    
+
     func logOutput(_ command: String, _ stringoutputfromrsync: [RsyncOutputData]?) async {
         guard let stringoutputfromrsync, !stringoutputfromrsync.isEmpty else { return }
         let stringdata = stringoutputfromrsync.map { record in
-            return record.record
+            record.record
         }
         let date = Date().localized_string_from_date()
         let header = "\n\(date): \(command)\n"

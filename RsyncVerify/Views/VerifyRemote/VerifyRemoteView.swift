@@ -63,8 +63,7 @@ struct VerifyRemoteView: View {
 
         } detail: {
             NavigationStack(path: $verifypath) {
-                if pullremotedatanumbers?.outputfromrsync != nil,
-                   pushremotedatanumbers?.outputfromrsync != nil {
+                if pushandpullestimated {
                     HStack {
                         VStack(alignment: .leading) {
                             Text("Push")
@@ -128,34 +127,39 @@ struct VerifyRemoteView: View {
     @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
         ToolbarItem {
-            ConditionalGlassButton(
-                systemImage: "arrow.up",
-                helpText: "Verify selected"
-            ) {
-                guard let selectedconfig else { return }
-                guard selectedtaskishalted == false else { return }
-                guard SharedReference.shared.process == nil else { return }
-                showinspector = false
-                verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+            
+            if pushandpullestimated == false {
+                ConditionalGlassButton(
+                    systemImage: "arrow.up",
+                    helpText: "Verify selected"
+                ) {
+                    guard let selectedconfig else { return }
+                    guard selectedtaskishalted == false else { return }
+                    guard SharedReference.shared.process == nil else { return }
+                    showinspector = false
+                    verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+                }
+                .disabled(disabledpushpull)
             }
-            .disabled(disabledpushpull)
         }
 
         ToolbarItem {
             Spacer()
         }
 
-        ToolbarItem {
-            ConditionalGlassButton(
-                systemImage: "figure.run",
-                helpText: "Excute"
-            ) {
-                guard let selectedconfig else { return }
-                verifypath.append(Verify(task: .executenpushpullview(configID: selectedconfig.id)))
+        if pushandpullestimated == true {
+            ToolbarItem {
+                ConditionalGlassButton(
+                    systemImage: "figure.run",
+                    helpText: "Excute"
+                ) {
+                    guard let selectedconfig else { return }
+                    verifypath.append(Verify(task: .executenpushpullview(configID: selectedconfig.id)))
+                }
+                .disabled(disabledpushpull)
             }
-            .disabled(disabledpushpull)
         }
-
+        
         ToolbarItem {
             Spacer()
         }
@@ -169,6 +173,7 @@ struct VerifyRemoteView: View {
                 pushremotedatanumbers = nil
                 selecteduuids.removeAll()
                 selectedconfig = nil
+                verifypath.removeAll()
             }
         }
 
@@ -280,5 +285,10 @@ struct VerifyRemoteView: View {
         guard let selectedconfig else { return true }
         guard SharedReference.shared.rsyncversion3 else { return true }
         return selectedconfig.offsiteServer.isEmpty
+    }
+    
+    var pushandpullestimated: Bool {
+        return (pullremotedatanumbers?.outputfromrsync != nil &&
+           pushremotedatanumbers?.outputfromrsync != nil)
     }
 }

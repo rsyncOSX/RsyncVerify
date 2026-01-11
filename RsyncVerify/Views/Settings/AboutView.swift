@@ -12,9 +12,6 @@ struct AboutView: View {
 
     @State private var urlstring = ""
 
-    var changelog: String {
-        Resources().getResource(resource: .changelog)
-    }
 
     var appVersion: String {
         (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "1.0"
@@ -60,15 +57,7 @@ struct AboutView: View {
 
             Section {
                 HStack {
-                    ConditionalGlassButton(
-                        systemImage: "doc.plaintext",
-                        text: "Changelog",
-                        helpText: "Changelog"
-                    ) {
-                        openChangelog()
-                        dismiss()
-                    }
-
+                    
                     if SharedReference.shared.newversion {
                         ConditionalGlassButton(
                             systemImage: "square.and.arrow.down.fill",
@@ -101,10 +90,6 @@ struct AboutView: View {
                         .font(.title3)
                         .fontWeight(.bold)
 
-                } else {
-                    Text("Changelog")
-                        .font(.title3)
-                        .fontWeight(.bold)
                 }
             }
         }
@@ -129,12 +114,7 @@ struct AboutView: View {
 }
 
 extension AboutView {
-    func openChangelog() {
-        if let url = URL(string: changelog) {
-            NSWorkspace.shared.open(url)
-        }
-    }
-
+    
     func openDownload() {
         if urlstring.isEmpty == false, let url = URL(string: urlstring) {
             NSWorkspace.shared.open(url)

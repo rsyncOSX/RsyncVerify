@@ -90,6 +90,19 @@ struct VerifyRemoteView: View {
                                         }
                                     }
                                 }
+                                
+                                ConditionalGlassButton(
+                                    systemImage: "questionmark.text.page.fill",
+                                    helpText: "Analyze output from Push"
+                                ) {
+                                    Task {
+                                        if let output = pushremotedatanumbers?.outputfromrsync {
+                                            Logger.process.debugMessageOnly("Anayling: LOGGING details to logfile")
+                                            let analyse = await ActorRsyncOutputAnalyzer().analyze(output)
+                                            _ = await ActorLogToFile().logOutput("Analysis PUSH output", analyse?.normalized())
+                                        }
+                                    }
+                                }
                             }
 
                             if let pushremotedatanumbers {
@@ -123,13 +136,14 @@ struct VerifyRemoteView: View {
                                 }
 
                                 ConditionalGlassButton(
-                                    systemImage: "square.and.arrow.down.fill",
+                                    systemImage: "questionmark.text.page.fill",
                                     helpText: "Analyze output from Pull"
                                 ) {
                                     Task {
                                         if let output = pullremotedatanumbers?.outputfromrsync {
-                                            Logger.process.debugMessageOnly("Execute: LOGGING details to logfile")
-                                            _ = await ActorLogToFile().logOutput("PULL output", output)
+                                            Logger.process.debugMessageOnly("Anayling: LOGGING details to logfile")
+                                            let analyse = await ActorRsyncOutputAnalyzer().analyze(output)
+                                            _ = await ActorLogToFile().logOutput("Analysis PULL output", analyse?.normalized())
                                         }
                                     }
                                 }

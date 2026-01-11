@@ -35,26 +35,26 @@ struct ExecutePushPullView: View {
             } else {
                 HStack {
                     executeview
-                    
+
                     if pushpullcommand == .pullRemote {
                         let totalPull = Double(rsyncpullmax)
                         SynchronizeProgressView(max: Double(rsyncpullmax),
                                                 progress: min(Swift.max(progress, 0), totalPull),
                                                 statusText: "Push data")
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
 
                     } else {
                         let totalPush = Double(rsyncpushmax)
                         SynchronizeProgressView(max: Double(rsyncpushmax),
                                                 progress: min(Swift.max(progress, 0), totalPush),
                                                 statusText: "Pull data")
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
                     }
                 }
             }

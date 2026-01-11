@@ -31,6 +31,8 @@ struct VerifyRemoteView: View {
     @State private var isadjusted: Bool = false
     // Tag output or not
     @State private var istagged: Bool = false
+    // Keep or remove delete
+    @State private var keepdelete: Bool = false
     // @State private var pushorpull = ObservableVerifyRemotePushPull()
     @State private var pushpullcommand = PushPullCommand.pushLocal
     @State private var verifypath: [Verify] = []
@@ -122,7 +124,7 @@ struct VerifyRemoteView: View {
         }
         .inspector(isPresented: $showinspector) {
             inspectorView
-                .inspectorColumnWidth(min: 100, ideal: 200, max: 300)
+                .inspectorColumnWidth(min: 400, ideal: 500, max: 600)
         }
         .toolbar { toolbarContent }
     }
@@ -130,7 +132,6 @@ struct VerifyRemoteView: View {
     @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
         ToolbarItem {
-            
             if pushandpullestimated == false {
                 ConditionalGlassButton(
                     systemImage: "arrow.up",
@@ -162,7 +163,7 @@ struct VerifyRemoteView: View {
                 .disabled(disabledpushpull)
             }
         }
-        
+
         ToolbarItem {
             Spacer()
         }
@@ -187,13 +188,26 @@ struct VerifyRemoteView: View {
 
     var inspectorView: some View {
         VStack(alignment: .center) {
-            Toggle("Adjust output", isOn: $isadjusted)
-                .toggleStyle(.switch)
-                .padding(10)
-            
-            Toggle("Tag output", isOn: $istagged)
-                .toggleStyle(.switch)
-                .padding(10)
+            HStack {
+                Toggle("Adjust output", isOn: $isadjusted)
+                    .toggleStyle(.switch)
+                    .padding(10)
+
+                Toggle("Tag output", isOn: $istagged)
+                    .toggleStyle(.switch)
+                    .padding(10)
+
+                Toggle("Keep delete", isOn: $keepdelete)
+                    .toggleStyle(.switch)
+                    .padding(10)
+            }
+            .padding()
+
+            if let selectedconfig {
+                RsyncCommandView(config: selectedconfig,
+                                 keepdelete: keepdelete)
+                    .padding()
+            }
         }
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -293,9 +307,9 @@ struct VerifyRemoteView: View {
         guard SharedReference.shared.rsyncversion3 else { return true }
         return selectedconfig.offsiteServer.isEmpty
     }
-    
+
     var pushandpullestimated: Bool {
-        return (pullremotedatanumbers?.outputfromrsync != nil &&
-           pushremotedatanumbers?.outputfromrsync != nil)
+        (pullremotedatanumbers?.outputfromrsync != nil &&
+            pushremotedatanumbers?.outputfromrsync != nil)
     }
 }

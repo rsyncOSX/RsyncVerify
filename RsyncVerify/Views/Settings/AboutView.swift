@@ -12,7 +12,6 @@ struct AboutView: View {
 
     @State private var urlstring = ""
 
-
     var appVersion: String {
         (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "1.0"
     }
@@ -57,7 +56,6 @@ struct AboutView: View {
 
             Section {
                 HStack {
-                    
                     if SharedReference.shared.newversion {
                         ConditionalGlassButton(
                             systemImage: "square.and.arrow.down.fill",
@@ -89,7 +87,6 @@ struct AboutView: View {
                     Text("There is a new version available for download")
                         .font(.title3)
                         .fontWeight(.bold)
-
                 }
             }
         }
@@ -114,7 +111,6 @@ struct AboutView: View {
 }
 
 extension AboutView {
-    
     func openDownload() {
         if urlstring.isEmpty == false, let url = URL(string: urlstring) {
             NSWorkspace.shared.open(url)

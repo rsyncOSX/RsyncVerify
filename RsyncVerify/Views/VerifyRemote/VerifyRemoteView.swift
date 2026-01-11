@@ -121,6 +121,18 @@ struct VerifyRemoteView: View {
                                         }
                                     }
                                 }
+                                
+                                ConditionalGlassButton(
+                                    systemImage: "square.and.arrow.down.fill",
+                                    helpText: "Analyze output from Pull"
+                                ) {
+                                    Task {
+                                        if let output = pullremotedatanumbers?.outputfromrsync {
+                                            Logger.process.debugMessageOnly("Execute: LOGGING details to logfile")
+                                            _ = await ActorLogToFile().logOutput("PULL output", output)
+                                        }
+                                    }
+                                }
                             }
 
                             if let pullremotedatanumbers {

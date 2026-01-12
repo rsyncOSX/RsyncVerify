@@ -29,7 +29,7 @@ struct VerifyRemoteView: View {
     @State private var selectedconfig: SynchronizeConfiguration?
     @State private var selectedtaskishalted: Bool = false
     @State private var isadjusted: Bool = false
-    @State private var istagged: Bool = false
+    @State private var istagged: Bool = true
     @State private var keepdelete: Bool = false
     @State private var pushpullcommand = PushPullCommand.pushLocal
     @State private var verifypath: [Verify] = []

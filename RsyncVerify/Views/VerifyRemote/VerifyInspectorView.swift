@@ -16,11 +16,12 @@ struct VerifyInspectorView: View {
     var body: some View {
         VStack(alignment: .center) {
             HStack {
-                Toggle("Adjust output", isOn: $isadjusted)
+                
+                Toggle("Tag output", isOn: $istagged)
                     .toggleStyle(.switch)
                     .padding(10)
-
-                Toggle("Tag output", isOn: $istagged)
+                
+                Toggle("Adjust output", isOn: $isadjusted)
                     .toggleStyle(.switch)
                     .padding(10)
 

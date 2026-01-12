@@ -23,7 +23,7 @@ struct VerifyToolbarContent: ToolbarContent {
         ToolbarItem {
             if pushandpullestimated == false {
                 ConditionalGlassButton(
-                    systemImage: "arrow.up",
+                    systemImage: "return",
                     helpText: "Verify selected"
                 ) {
                     guard let selectedconfig else { return }

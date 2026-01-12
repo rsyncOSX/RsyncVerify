@@ -15,20 +15,24 @@ struct RsyncCommandView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                Picker("", selection: $selectedrsynccommand) {
-                    ForEach(RsyncCommand.allCases) { Text($0.description)
-                        .tag($0)
+            
+            
+                HStack {
+                    
+                    Text("Push and Pull\ncommand strings")
+                    
+                    Picker("", selection: $selectedrsynccommand) {
+                        ForEach(RsyncCommand.allCases) { Text($0.description)
+                            .tag($0)
+                        }
                     }
-                }
-                .pickerStyle(RadioGroupPickerStyle())
-                .padding(10)
-            }
-
-            VStack(alignment: .leading) {
-                showcommandrsync
+                    .pickerStyle(RadioGroupPickerStyle())
                     .padding(10)
-            }
+                }
+            
+            showcommandrsync
+                .padding(10)
+            
         }
         .padding(10)
     }

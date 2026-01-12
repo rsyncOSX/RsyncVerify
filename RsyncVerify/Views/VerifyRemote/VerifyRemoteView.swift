@@ -106,7 +106,7 @@ struct VerifyRemoteView: View {
                             }
 
                             if let pushremotedatanumbers {
-                                DetailsVerifyView2(remotedatanumbers: pushremotedatanumbers,
+                                DetailsVerifyView(remotedatanumbers: pushremotedatanumbers,
                                                    istagged: istagged)
                                     .padding(10)
                             }
@@ -150,7 +150,7 @@ struct VerifyRemoteView: View {
                             }
 
                             if let pullremotedatanumbers {
-                                DetailsVerifyView2(remotedatanumbers: pullremotedatanumbers,
+                                DetailsVerifyView(remotedatanumbers: pullremotedatanumbers,
                                                    istagged: istagged)
                                     .padding(10)
                             }

@@ -173,6 +173,9 @@ struct ExecutePushPullView: View {
             },
             cleanup: { activeStreamingProcess = nil; streamingHandlers = nil }
         )
+        
+        guard SharedReference.shared.norsync == false else { return }
+        guard config.task != SharedReference.shared.halted else { return }
         guard let arguments else { return }
         guard let streamingHandlers else { return }
 

@@ -97,9 +97,9 @@ struct VerifyRemoteView: View {
                                 ) {
                                     Task {
                                         if let output = pushremotedatanumbers?.outputfromrsync {
-                                            Logger.process.debugMessageOnly("Anayling: LOGGING details to logfile")
+                                            Logger.process.debugMessageOnly("Analysis: LOGGING details to logfile")
                                             let analyse = await ActorRsyncOutputAnalyzer().analyze(output)
-                                            _ = await ActorLogToFile().logOutput("Analysis PUSH output", analyse?.normalized())
+                                            // _ = await ActorLogToFile().logOutput("Analysis PUSH output", analyse?.normalized())
                                         }
                                     }
                                 }
@@ -141,9 +141,9 @@ struct VerifyRemoteView: View {
                                 ) {
                                     Task {
                                         if let output = pullremotedatanumbers?.outputfromrsync {
-                                            Logger.process.debugMessageOnly("Anayling: LOGGING details to logfile")
+                                            Logger.process.debugMessageOnly("Analysis: LOGGING details to logfile")
                                             let analyse = await ActorRsyncOutputAnalyzer().analyze(output)
-                                            _ = await ActorLogToFile().logOutput("Analysis PULL output", analyse?.normalized())
+                                            // _ = await ActorLogToFile().logOutput("Analysis PULL output", analyse?.normalized())
                                         }
                                     }
                                 }

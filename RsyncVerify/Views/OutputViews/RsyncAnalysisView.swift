@@ -17,16 +17,16 @@ struct RsyncAnalysisView: View {
         VStack(spacing: 0) {
             // Header with run type
             runTypeHeader
-
+/*
             // Tab selection
-            Picker("View", selection: $selectedTab) {
+            Picker("", selection: $selectedTab) {
                 Text("Overview").tag(0)
                 Text("Changes").tag(1)
                 Text("Statistics").tag(2)
             }
             .pickerStyle(.segmented)
             .padding()
-
+     */
             // Content based on selected tab
             TabView(selection: $selectedTab) {
                 overviewView
@@ -60,7 +60,7 @@ struct RsyncAnalysisView: View {
 
     private var overviewView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 12) {
                 // Quick stats
                 quickStatsSection
 
@@ -625,57 +625,4 @@ struct FlagBadge: View {
             .foregroundColor(color)
             .cornerRadius(4)
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    RsyncAnalysisView(
-        analysisResult: ActorRsyncOutputAnalyzer.AnalysisResult(
-            itemizedChanges: [
-                ActorRsyncOutputAnalyzer.ItemizedChange(
-                    changeType: .file,
-                    path: "/Users/test/Documents/file1.txt",
-                    target: nil,
-                    flags: ActorRsyncOutputAnalyzer.ChangeFlags(from: ".f.st......")
-                ),
-                ActorRsyncOutputAnalyzer.ItemizedChange(
-                    changeType: .directory,
-                    path: "/Users/test/Documents/newfolder",
-                    target: nil,
-                    flags: ActorRsyncOutputAnalyzer.ChangeFlags(from: ".d..........")
-                ),
-                ActorRsyncOutputAnalyzer.ItemizedChange(
-                    changeType: .symlink,
-                    path: "/Users/test/link",
-                    target: "/Users/test/target",
-                    flags: ActorRsyncOutputAnalyzer.ChangeFlags(from: ".L.....p...")
-                )
-            ],
-            statistics: ActorRsyncOutputAnalyzer.Statistics(
-                totalFiles: ActorRsyncOutputAnalyzer.FileCount(
-                    total: 16087,
-                    regular: 14321,
-                    directories: 1721,
-                    links: 45
-                ),
-                filesCreated: ActorRsyncOutputAnalyzer.FileCount(
-                    total: 10,
-                    regular: 8,
-                    directories: 2,
-                    links: 0
-                ),
-                filesDeleted: 5,
-                regularFilesTransferred: 25,
-                totalFileSize: 5_000_000_000,
-                totalTransferredSize: 250_000_000,
-                literalData: 200_000_000,
-                matchedData: 50_000_000,
-                bytesSent: 300_000,
-                bytesReceived: 150_000,
-                speedup: 1865.63
-            ),
-            isDryRun: true
-        )
-    )
 }

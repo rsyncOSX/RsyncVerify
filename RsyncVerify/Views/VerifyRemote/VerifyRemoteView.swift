@@ -97,14 +97,13 @@ struct VerifyRemoteView: View {
                                     systemImage: "questionmark.text.page.fill",
                                     helpText: "Analyze output from Push"
                                 ) {
-                                    
                                     verifypath.append(Verify(task: .analyseviewpush))
                                 }
                             }
 
                             if let pushremotedatanumbers {
                                 DetailsVerifyView(remotedatanumbers: pushremotedatanumbers,
-                                                   istagged: istagged)
+                                                  istagged: istagged)
                                     .padding(10)
                             }
                         }
@@ -142,7 +141,7 @@ struct VerifyRemoteView: View {
 
                             if let pullremotedatanumbers {
                                 DetailsVerifyView(remotedatanumbers: pullremotedatanumbers,
-                                                   istagged: istagged)
+                                                  istagged: istagged)
                                     .padding(10)
                             }
                         }
@@ -337,15 +336,16 @@ struct VerifyRemoteView: View {
                         }
                 }
             }
+
         case .analyseviewpush:
-                if let output = pushremotedatanumbers?.outputfromrsync {
-                    AsyncAnalyseView(output: output)
-                }
+            if let output = pushremotedatanumbers?.outputfromrsync {
+                AsyncAnalyseView(output: output)
+            }
+
         case .analyseviewpull:
-                if let output = pullremotedatanumbers?.outputfromrsync {
-                    AsyncAnalyseView(output: output)
-                }
-            
+            if let output = pullremotedatanumbers?.outputfromrsync {
+                AsyncAnalyseView(output: output)
+            }
         }
     }
 
@@ -368,12 +368,11 @@ struct VerifyRemoteView: View {
     }
 }
 
-
 // Inline helper view
-struct AsyncAnalyseView:  View {
+struct AsyncAnalyseView: View {
     let output: [RsyncOutputData]
     @State private var analyse: ActorRsyncOutputAnalyzer.AnalysisResult?
-    
+
     var body: some View {
         Group {
             if let analyse {

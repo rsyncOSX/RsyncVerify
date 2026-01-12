@@ -1,5 +1,5 @@
 //
-//  DetailsVerifyView2.swift
+//  DetailsVerifyView.swift
 //  RsyncVerify
 //
 //  Created by Thomas Evensen on 20/11/2024.
@@ -155,7 +155,7 @@ struct RsyncFileChange {
 
         for (index, name, code) in attributePositions {
             let char = prefix[prefix.index(prefix.startIndex, offsetBy: index)]
-            if let code = code, char == code {
+            if let code, char == code {
                 attrs.append(RsyncAttribute(name: name, code: char))
             }
         }

@@ -12,7 +12,8 @@ enum DestinationVerifyView: Hashable {
     case executenpushpullview(configID: SynchronizeConfiguration.ID)
     case pushview(configID: SynchronizeConfiguration.ID)
     case pullview(configID: SynchronizeConfiguration.ID)
-    case analyseview
+    case analyseviewpush
+    case analyseviewpull
 }
 
 struct Verify: Hashable, Identifiable {
@@ -97,7 +98,7 @@ struct VerifyRemoteView: View {
                                     helpText: "Analyze output from Push"
                                 ) {
                                     
-                                    verifypath.append(Verify(task: .analyseview))
+                                    verifypath.append(Verify(task: .analyseviewpush))
                                 }
                             }
 
@@ -135,13 +136,7 @@ struct VerifyRemoteView: View {
                                     systemImage: "questionmark.text.page.fill",
                                     helpText: "Analyze output from Pull"
                                 ) {
-                                    Task {
-                                        if let output = pullremotedatanumbers?.outputfromrsync {
-                                            Logger.process.debugMessageOnly("Analysis: LOGGING details to logfile")
-                                            let analyse = await ActorRsyncOutputAnalyzer().analyze(output)
-                                            // _ = await ActorLogToFile().logOutput("Analysis PULL output", analyse?.normalized())
-                                        }
-                                    }
+                                    verifypath.append(Verify(task: .analyseviewpull))
                                 }
                             }
 
@@ -342,8 +337,12 @@ struct VerifyRemoteView: View {
                         }
                 }
             }
-        case .analyseview:
+        case .analyseviewpush:
                 if let output = pushremotedatanumbers?.outputfromrsync {
+                    AsyncAnalyseView(output: output)
+                }
+        case .analyseviewpull:
+                if let output = pullremotedatanumbers?.outputfromrsync {
                     AsyncAnalyseView(output: output)
                 }
             

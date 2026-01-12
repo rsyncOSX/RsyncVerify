@@ -18,6 +18,8 @@ struct VerifyToolbarContent: ToolbarContent {
     @Binding var pushremotedatanumbers: RemoteDataNumbers?
     @Binding var selecteduuids: Set<SynchronizeConfiguration.ID>
     @Binding var selectedconfigBinding: SynchronizeConfiguration?
+    @Binding var pushonly: Bool
+    @Binding var pullonly: Bool
     
     var body: some ToolbarContent {
         ToolbarItem {
@@ -30,7 +32,12 @@ struct VerifyToolbarContent: ToolbarContent {
                     guard selectedtaskishalted == false else { return }
                     guard SharedReference.shared.process == nil else { return }
                     showinspector = false
-                    verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+                    if pullonly {
+                        verifypath.append(Verify(task: .pullview(configID: selectedconfig.id)))
+                    } else {
+                        verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+                    }
+                    
                 }
                 .disabled(disabledpushpull)
             }

@@ -16,6 +16,8 @@ struct PullView: View {
     @Binding var pullremotedatanumbers: RemoteDataNumbers?
     // Push data to remote, adjusted
     @Binding var pushremotedatanumbers: RemoteDataNumbers?
+    // Pullonly
+    @Binding var pullonly: Bool
     // If aborted
     @State private var isaborted: Bool = false
 

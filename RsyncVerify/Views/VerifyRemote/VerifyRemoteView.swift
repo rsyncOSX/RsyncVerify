@@ -31,6 +31,8 @@ struct VerifyRemoteView: View {
     @State private var isadjusted: Bool = false
     @State private var istagged: Bool = true
     @State private var keepdelete: Bool = false
+    @State private var pushonly: Bool = false
+    @State private var pullonly: Bool = false
     @State private var pushpullcommand = PushPullCommand.pushLocal
     @State private var verifypath: [Verify] = []
     @State var showinspector: Bool = false
@@ -48,8 +50,9 @@ struct VerifyRemoteView: View {
                 isadjusted: $isadjusted,
                 istagged: $istagged,
                 keepdelete: $keepdelete,
-                selectedconfig: selectedconfig
-            )
+                pushonly: $pushonly,
+                pullonly: $pullonly,
+                selectedconfig: selectedconfig)
             .inspectorColumnWidth(min: 400, ideal: 500, max: 600)
         }
         .toolbar {
@@ -63,7 +66,9 @@ struct VerifyRemoteView: View {
                 pullremotedatanumbers: $pullremotedatanumbers,
                 pushremotedatanumbers: $pushremotedatanumbers,
                 selecteduuids: $selecteduuids,
-                selectedconfigBinding: $selectedconfig
+                selectedconfigBinding: $selectedconfig,
+                pushonly: $pushonly,
+                pullonly: $pullonly
             )
         }
     }
@@ -215,6 +220,7 @@ struct VerifyRemoteView: View {
                 verifypath: $verifypath,
                 pushpullcommand: $pushpullcommand,
                 pushremotedatanumbers: $pushremotedatanumbers,
+                pushonly: $pushonly,
                 config: config,
                 isadjusted: isadjusted
             )
@@ -230,11 +236,12 @@ struct VerifyRemoteView: View {
                 pushpullcommand: $pushpullcommand,
                 pullremotedatanumbers: $pullremotedatanumbers,
                 pushremotedatanumbers: $pushremotedatanumbers,
+                pullonly: $pullonly,
                 config: config,
                 isadjusted: isadjusted
             )
             .onDisappear {
-                if isadjusted {
+                if isadjusted && pullonly == false && pushonly == false {
                     prepareadjustedoutput()
                 }
             }

@@ -5,6 +5,25 @@
 //  Created by Thomas Evensen on 20/11/2024.
 //
 
+// Rsync itemized change format documentation:
+// YXcstpoguax  path/to/file
+// Where Y is one of:
+//   '.' = no change
+//   '*' = updated
+//   '+' = created
+//   '-' = deleted
+//   '>' = transferred
+//   'h' = hard link
+//   '.' = unchanged
+//   '?' = message
+
+// X is one of:
+//   'f' = file
+//   'd' = directory
+//   'L' = symlink
+//   'D' = device
+//   'S' = special
+
 import SwiftUI
 
 struct DetailsVerifyView: View {

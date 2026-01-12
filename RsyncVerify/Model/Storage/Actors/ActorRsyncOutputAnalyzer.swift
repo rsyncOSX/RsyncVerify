@@ -207,7 +207,6 @@ actor ActorRsyncOutputAnalyzer {
     }
 
     func analyze(_ output: [RsyncOutputData]) -> AnalysisResult? {
-        
         guard !output.isEmpty else { return nil }
         let stringdata = output.map { record in
             record.record
@@ -245,7 +244,7 @@ actor ActorRsyncOutputAnalyzer {
             isDryRun: isDryRun
         )
     }
-    
+
     // MARK: - Parsing Functions
 
     private func parseItemizedChange(_ line: String) -> ItemizedChange? {

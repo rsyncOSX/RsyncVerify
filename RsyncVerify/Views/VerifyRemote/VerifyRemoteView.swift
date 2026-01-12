@@ -90,7 +90,7 @@ struct VerifyRemoteView: View {
                                         }
                                     }
                                 }
-                                
+
                                 ConditionalGlassButton(
                                     systemImage: "questionmark.text.page.fill",
                                     helpText: "Analyze output from Push"

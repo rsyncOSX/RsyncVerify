@@ -12,6 +12,7 @@ enum DestinationVerifyView: Hashable {
     case executenpushpullview(configID: SynchronizeConfiguration.ID)
     case pushview(configID: SynchronizeConfiguration.ID)
     case pullview(configID: SynchronizeConfiguration.ID)
+    case analyseview
 }
 
 struct Verify: Hashable, Identifiable {
@@ -95,13 +96,8 @@ struct VerifyRemoteView: View {
                                     systemImage: "questionmark.text.page.fill",
                                     helpText: "Analyze output from Push"
                                 ) {
-                                    Task {
-                                        if let output = pushremotedatanumbers?.outputfromrsync {
-                                            Logger.process.debugMessageOnly("Analysis: LOGGING details to logfile")
-                                            let analyse = await ActorRsyncOutputAnalyzer().analyze(output)
-                                            // _ = await ActorLogToFile().logOutput("Analysis PUSH output", analyse?.normalized())
-                                        }
-                                    }
+                                    
+                                    verifypath.append(Verify(task: .analyseview))
                                 }
                             }
 
@@ -346,6 +342,11 @@ struct VerifyRemoteView: View {
                         }
                 }
             }
+        case .analyseview:
+                if let output = pushremotedatanumbers?.outputfromrsync {
+                    AsyncAnalyseView(output: output)
+                }
+            
         }
     }
 
@@ -365,5 +366,25 @@ struct VerifyRemoteView: View {
     var pushandpullestimated: Bool {
         (pullremotedatanumbers?.outputfromrsync != nil &&
             pushremotedatanumbers?.outputfromrsync != nil)
+    }
+}
+
+
+// Inline helper view
+struct AsyncAnalyseView:  View {
+    let output: [RsyncOutputData]
+    @State private var analyse: ActorRsyncOutputAnalyzer.AnalysisResult?
+    
+    var body: some View {
+        Group {
+            if let analyse {
+                RsyncAnalysisView(analysisResult: analyse)
+            } else {
+                ProgressView()
+            }
+        }
+        .task {
+            analyse = await ActorRsyncOutputAnalyzer().analyze(output)
+        }
     }
 }

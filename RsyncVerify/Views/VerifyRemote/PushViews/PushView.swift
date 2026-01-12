@@ -11,10 +11,8 @@ import SwiftUI
 
 struct PushView: View {
     @Binding var verifypath: [Verify]
-    @Binding var pushpullcommand: PushPullCommand
     // Push data to remote, adjusted
     @Binding var pushremotedatanumbers: RemoteDataNumbers?
-    // Pushonly
     @Binding var pushonly: Bool
     // If aborted
     @State private var isaborted: Bool = false

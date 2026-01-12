@@ -106,15 +106,6 @@ struct VerifyRemoteView: View {
     
     private var detailContent: some View {
         NavigationStack(path: $verifypath) {
-            /*
-            if pushandpullestimated {
-                PushPullDetailsView(
-                    pushremotedatanumbers: pushremotedatanumbers,
-                    pullremotedatanumbers: pullremotedatanumbers,
-                    istagged: istagged,
-                    verifypath: $verifypath
-                )
-             */
             if verifypath.isEmpty  { configurationsTableView }
         }
         .navigationDestination(for: Verify.self) { which in
@@ -224,7 +215,6 @@ struct VerifyRemoteView: View {
            let config = rsyncUIdata.configurations?[index] {
             PushView(
                 verifypath: $verifypath,
-                pushpullcommand: $pushpullcommand,
                 pushremotedatanumbers: $pushremotedatanumbers,
                 pushonly: $pushonly,
                 config: config,
@@ -239,9 +229,7 @@ struct VerifyRemoteView: View {
            let config = rsyncUIdata.configurations?[index] {
             PullView(
                 verifypath: $verifypath,
-                pushpullcommand: $pushpullcommand,
                 pullremotedatanumbers: $pullremotedatanumbers,
-                pushremotedatanumbers: $pushremotedatanumbers,
                 pullonly: $pullonly,
                 config: config,
                 isadjusted: isadjusted

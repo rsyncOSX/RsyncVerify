@@ -14,6 +14,8 @@ enum DestinationVerifyView: Hashable {
     case pullview(configID: SynchronizeConfiguration.ID)
     case analyseviewpush
     case analyseviewpull
+    case pushviewonly
+    case pullviewonly
 }
 
 struct Verify: Hashable, Identifiable {
@@ -104,6 +106,7 @@ struct VerifyRemoteView: View {
     
     private var detailContent: some View {
         NavigationStack(path: $verifypath) {
+            /*
             if pushandpullestimated {
                 PushPullDetailsView(
                     pushremotedatanumbers: pushremotedatanumbers,
@@ -111,9 +114,8 @@ struct VerifyRemoteView: View {
                     istagged: istagged,
                     verifypath: $verifypath
                 )
-            } else {
-                configurationsTableView
-            }
+             */
+            if verifypath.isEmpty  { configurationsTableView }
         }
         .navigationDestination(for: Verify.self) { which in
             makeView(view: which.task)
@@ -183,18 +185,22 @@ struct VerifyRemoteView: View {
         switch view {
         case let .executenpushpullview(configuuid):
             executePushPullView(for: configuuid)
-
         case let .pushview(configuuid):
             pushView(for: configuuid)
-
         case let .pullview(configuuid):
             pullView(for: configuuid)
-
         case .analyseviewpush:
             analyseView(for: pushremotedatanumbers)
-
         case .analyseviewpull:
             analyseView(for: pullremotedatanumbers)
+        case .pushviewonly:
+            PushDetailsSection(pushremotedatanumbers: pushremotedatanumbers,
+                               istagged: istagged,
+                               verifypath: $verifypath)
+        case .pullviewonly:
+            PullDetailsSection(pullremotedatanumbers: pullremotedatanumbers,
+                               istagged: istagged,
+                               verifypath: $verifypath)
         }
     }
     
@@ -240,11 +246,6 @@ struct VerifyRemoteView: View {
                 config: config,
                 isadjusted: isadjusted
             )
-            .onDisappear {
-                if isadjusted && pullonly == false && pushonly == false {
-                    prepareadjustedoutput()
-                }
-            }
         }
     }
     

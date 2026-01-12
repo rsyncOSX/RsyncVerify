@@ -121,6 +121,11 @@ struct PullView: View {
             activeStreamingProcess = nil
             streamingHandlers = nil
             verifypath.removeAll()
+            if pullonly == true {
+                verifypath.append(Verify(task: .pullviewonly))
+            }
+            
+            
         }
     }
 

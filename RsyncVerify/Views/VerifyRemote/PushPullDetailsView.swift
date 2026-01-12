@@ -39,15 +39,20 @@ struct PushDetailsSection: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("Push")
-                    .font(.title2)
-                    .padding()
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
-                    .padding(10)
-
+                
+                HStack {
+                    
+                    Text("Push ") + Text(Image(systemName: "arrow.right"))
+                        
+                }
+                .font(.title2)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+                .padding(10)
+                
                 ConditionalGlassButton(
                     systemImage: "square.and.arrow.down.fill",
                     helpText: "Save Push data to file"
@@ -85,14 +90,19 @@ struct PullDetailsSection: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("Pull")
-                    .font(.title2)
-                    .padding()
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
-                    .padding(10)
+                HStack {
+                    
+                    Text(Image(systemName: "arrow.left")) + Text("Pull ")
+                        
+                }
+                .font(.title2)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+                .padding(10)
+                
 
                 ConditionalGlassButton(
                     systemImage: "square.and.arrow.down.fill",

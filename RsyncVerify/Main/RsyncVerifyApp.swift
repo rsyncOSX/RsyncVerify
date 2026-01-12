@@ -17,7 +17,7 @@ struct RsyncVerifyApp: App {
     var body: some Scene {
         Window("RsyncVerify", id: "main") {
             RsyncVerifyView()
-                .frame(minWidth: 1100, idealWidth: 1300, minHeight: 580)
+                .frame(minWidth: 1250, minHeight: 450)
                 .sheet(isPresented: $showabout) { AboutView() }
                 .onDisappear {
                     // Quit the app when the main window is closed

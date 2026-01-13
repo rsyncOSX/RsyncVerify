@@ -119,7 +119,7 @@ struct ExecutePushPullView: View {
                                 dryrun: $dryrun,
                                 keepdelete: $keepdelete,
                                 config: config)
-                .padding(10)
+                .padding()
         }
         .overlay(
             RoundedRectangle(cornerRadius: 12)

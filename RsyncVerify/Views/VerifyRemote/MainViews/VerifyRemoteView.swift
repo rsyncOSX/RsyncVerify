@@ -151,7 +151,11 @@ struct VerifyRemoteView: View {
             selectedconfig = configurations[index]
             showinspector = true
         } else {
+            pullremotedatanumbers = nil
+            pushremotedatanumbers = nil
+            selecteduuids.removeAll()
             selectedconfig = nil
+            verifypath.removeAll()
             showinspector = false
         }
     }

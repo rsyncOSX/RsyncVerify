@@ -64,15 +64,11 @@ struct VerifyRemoteView: View {
                 pushandpullestimated: pushandpullestimated,
                 disabledpushpull: disabledpushpull,
                 selectedconfig: selectedconfig,
-                selectedtaskishalted: selectedtaskishalted,
-                showinspector: $showinspector,
                 verifypath: $verifypath,
                 pullremotedatanumbers: $pullremotedatanumbers,
                 pushremotedatanumbers: $pushremotedatanumbers,
                 selecteduuids: $selecteduuids,
-                selectedconfigBinding: $selectedconfig,
-                pushonly: $pushonly,
-                pullonly: $pullonly
+                selectedconfigBinding: $selectedconfig
             )
         }
     }
@@ -108,7 +104,31 @@ struct VerifyRemoteView: View {
 
     private var detailContent: some View {
         NavigationStack(path: $verifypath) {
-            if verifypath.isEmpty { configurationsTableView }
+            
+            ZStack {
+              
+                if verifypath.isEmpty { configurationsTableView }
+                
+                if pushandpullestimated == false && selecteduuids.isEmpty == false {
+                    ConditionalGlassButton(
+                        systemImage: "play.fill",
+                        helpText: "Verify selected"
+                    ) {
+                        guard let selectedconfig else { return }
+                        guard selectedtaskishalted == false else { return }
+                        guard SharedReference.shared.process == nil else { return }
+                        showinspector = false
+                        if pullonly {
+                            verifypath.append(Verify(task: .pullview(configID: selectedconfig.id)))
+                        } else if pushonly {
+                            verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+                        } else {
+                            verifypath.append(Verify(task: .estimatepushandpullview(configID: selectedconfig.id)))
+                        }
+                    }
+                    .disabled(disabledpushpull)
+                }
+            }
         }
         .navigationDestination(for: Verify.self) { which in
             makeView(view: which.task)

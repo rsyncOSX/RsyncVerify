@@ -11,43 +11,14 @@ struct VerifyToolbarContent: ToolbarContent {
     let pushandpullestimated: Bool
     let disabledpushpull: Bool
     let selectedconfig: SynchronizeConfiguration?
-    let selectedtaskishalted: Bool
-    @Binding var showinspector: Bool
     @Binding var verifypath: [Verify]
     @Binding var pullremotedatanumbers: RemoteDataNumbers?
     @Binding var pushremotedatanumbers: RemoteDataNumbers?
     @Binding var selecteduuids: Set<SynchronizeConfiguration.ID>
     @Binding var selectedconfigBinding: SynchronizeConfiguration?
-    @Binding var pushonly: Bool
-    @Binding var pullonly: Bool
 
     var body: some ToolbarContent {
-        ToolbarItem {
-            if pushandpullestimated == false {
-                ConditionalGlassButton(
-                    systemImage: "return",
-                    helpText: "Verify selected"
-                ) {
-                    guard let selectedconfig else { return }
-                    guard selectedtaskishalted == false else { return }
-                    guard SharedReference.shared.process == nil else { return }
-                    showinspector = false
-                    if pullonly {
-                        verifypath.append(Verify(task: .pullview(configID: selectedconfig.id)))
-                    } else if pushonly {
-                        verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
-                    } else {
-                        verifypath.append(Verify(task: .estimatepushandpullview(configID: selectedconfig.id)))
-                    }
-                }
-                .disabled(disabledpushpull)
-            }
-        }
-
-        ToolbarItem {
-            Spacer()
-        }
-
+        
         if pushandpullestimated == true {
             ToolbarItem {
                 ConditionalGlassButton(

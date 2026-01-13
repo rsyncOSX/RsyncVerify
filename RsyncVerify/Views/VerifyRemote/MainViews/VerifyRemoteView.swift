@@ -16,6 +16,7 @@ enum DestinationVerifyView: Hashable {
     case analyseviewpull
     case pushviewonly
     case pullviewonly
+    case estimatepushandpullview(configID: SynchronizeConfiguration.ID)
 }
 
 struct Verify: Hashable, Identifiable {
@@ -193,6 +194,22 @@ struct VerifyRemoteView: View {
             PullDetailsSection(pullremotedatanumbers: pullremotedatanumbers,
                                istagged: istagged,
                                verifypath: $verifypath)
+        case let .estimatepushandpullview(configuuid):
+            estimatePushPullView(for: configuuid)
+        }
+    }
+
+    @ViewBuilder
+    private func estimatePushPullView(for configuuid: SynchronizeConfiguration.ID) -> some View {
+        if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
+           let config = rsyncUIdata.configurations?[index] {
+            EstimatePushandPull(verifypath: $verifypath,
+                                pushremotedatanumbers: $pushremotedatanumbers,
+                                pullremotedatanumbers: $pullremotedatanumbers,
+                                pullonly: $pullonly,
+                                pushonly: $pushonly,
+                                config: config,
+                                isadjusted: isadjusted)
         }
     }
 
@@ -217,8 +234,10 @@ struct VerifyRemoteView: View {
             PushView(
                 verifypath: $verifypath,
                 pushremotedatanumbers: $pushremotedatanumbers,
+                pushonly: $pushonly,
                 config: config,
-                isadjusted: isadjusted
+                isadjusted: isadjusted,
+                onComplete: {}
             )
         }
     }
@@ -230,6 +249,7 @@ struct VerifyRemoteView: View {
             PullView(
                 verifypath: $verifypath,
                 pullremotedatanumbers: $pullremotedatanumbers,
+                pullonly: $pullonly,
                 config: config,
                 isadjusted: isadjusted,
                 onComplete: {}

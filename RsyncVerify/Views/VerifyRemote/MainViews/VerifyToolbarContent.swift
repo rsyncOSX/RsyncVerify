@@ -34,8 +34,10 @@ struct VerifyToolbarContent: ToolbarContent {
                     showinspector = false
                     if pullonly {
                         verifypath.append(Verify(task: .pullview(configID: selectedconfig.id)))
-                    } else {
+                    } else if pushonly {
                         verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
+                    } else {
+                        verifypath.append(Verify(task: .estimatepushandpullview(configID: selectedconfig.id)))
                     }
                 }
                 .disabled(disabledpushpull)

@@ -13,6 +13,7 @@ struct PushView: View {
     @Binding var verifypath: [Verify]
     // Push data to remote, adjusted
     @Binding var pushremotedatanumbers: RemoteDataNumbers?
+    @Binding var pushonly: Bool
     // If aborted
     @State private var isaborted: Bool = false
 
@@ -23,6 +24,7 @@ struct PushView: View {
     let config: SynchronizeConfiguration
     let isadjusted: Bool
     let reduceestimatedcount: Int = 15
+    let onComplete: () -> Void
 
     var body: some View {
         HStack {
@@ -114,9 +116,12 @@ struct PushView: View {
             // Cleanup after all async work completes
             activeStreamingProcess = nil
             streamingHandlers = nil
-
             verifypath.removeAll()
-            verifypath.append(Verify(task: .pushviewonly))
+            // Mark completed
+            onComplete()
+            if pushonly {
+                verifypath.append(Verify(task: .pushviewonly))
+            }
         }
     }
 

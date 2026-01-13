@@ -13,9 +13,9 @@ struct PullView: View {
     @Binding var verifypath: [Verify]
     // Pull data from remote, adjusted
     @Binding var pullremotedatanumbers: RemoteDataNumbers?
+    @Binding var pullonly: Bool
     // If aborted
     @State private var isaborted: Bool = false
-
     // Streaming strong references
     @State private var streamingHandlers: RsyncProcessStreaming.ProcessHandlers?
     @State private var activeStreamingProcess: RsyncProcessStreaming.RsyncProcess?
@@ -119,7 +119,9 @@ struct PullView: View {
             verifypath.removeAll()
             // Mark completed
             onComplete()
-            verifypath.append(Verify(task: .pullviewonly))
+            if pullonly {
+                verifypath.append(Verify(task: .pullviewonly))
+            }
         }
     }
 

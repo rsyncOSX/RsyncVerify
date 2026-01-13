@@ -24,7 +24,7 @@ struct Verify: Hashable, Identifiable {
     var task: DestinationVerifyView
 }
 
-struct VerifyRemoteView: View {
+struct VerifyRemoteMainView: View {
     @Bindable var rsyncUIdata: RsyncVerifyconfigurations
     @Binding var selectedprofileID: ProfilesnamesRecord.ID?
 
@@ -240,6 +240,7 @@ struct VerifyRemoteView: View {
            let config = rsyncUIdata.configurations?[index] {
             ExecutePushPullView(
                 pushpullcommand: $pushpullcommand,
+                keepdelete: $keepdelete,
                 config: config,
                 pushorpullbool: pushorpull(),
                 rsyncpullmax: pullremotedatanumbers?.maxpushpull ?? 0,

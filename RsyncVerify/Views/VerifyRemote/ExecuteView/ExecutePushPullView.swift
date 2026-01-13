@@ -3,13 +3,13 @@ import RsyncProcessStreaming
 import SwiftUI
 
 struct ExecutePushPullView: View {
+    @Binding var pushpullcommand: PushPullCommand
+    @Binding var keepdelete: Bool
+
     @State private var showprogressview = false
     @State private var remotedatanumbers: RemoteDataNumbers?
-    @Binding var pushpullcommand: PushPullCommand
-
     @State private var dryrun: Bool = true
-    @State private var keepdelete: Bool = true
-
+    
     @State private var progress: Double = 0
     @State private var max: Double = 0
 
@@ -113,6 +113,7 @@ struct ExecutePushPullView: View {
                         }
                         .help("Remove the delete parameter, default is true?")
                 }
+                .padding()
             }
 
             PushPullCommandView(pushpullcommand: $pushpullcommand,

@@ -16,7 +16,7 @@ struct RsyncAnalysisView: View {
     var body: some View {
         VStack(spacing: 0) {
             runTypeHeader
-            
+
             TabView(selection: $selectedTab) {
                 AnalysisOverviewView(
                     statistics: analysisResult.statistics,

@@ -14,22 +14,22 @@ final class EstimatePull {
     let config: SynchronizeConfiguration
     let isadjusted: Bool
     let reduceestimatedcount: Int = 15
-    
+
     // Streaming strong references
     var streamingHandlers: RsyncProcessStreaming.ProcessHandlers?
     var activeStreamingProcess: RsyncProcessStreaming.RsyncProcess?
     var pullremotedatanumbers: RemoteDataNumbers?
     var onComplete: () -> Void
-    
+
     init(config: SynchronizeConfiguration, isadjusted: Bool, onComplete: @escaping () -> Void) {
         self.config = config
         self.isadjusted = isadjusted
         self.onComplete = onComplete
-        self.streamingHandlers = nil
-        self.activeStreamingProcess = nil
-        self.pullremotedatanumbers = nil
+        streamingHandlers = nil
+        activeStreamingProcess = nil
+        pullremotedatanumbers = nil
     }
-    
+
     // For check remote, pull remote data
     func pullRemote(config: SynchronizeConfiguration) {
         let arguments = ArgumentsPullRemote(config: config).argumentspullremotewithparameters(
@@ -37,11 +37,11 @@ final class EstimatePull {
             forDisplay: false,
             keepdelete: true
         )
-        
+
         streamingHandlers = CreateStreamingHandlers().createHandlersWithCleanup(
             fileHandler: { _ in },
             processTermination: { [weak self] output, hiddenID in
-                guard let self = self else { return }
+                guard let self else { return }
                 Task { @MainActor in
                     await self.pullProcessTermination(
                         stringoutputfromrsync: output,
@@ -56,12 +56,12 @@ final class EstimatePull {
                 }
             }
         )
-        
+
         guard SharedReference.shared.norsync == false else { return }
         guard config.task != SharedReference.shared.halted else { return }
         guard let arguments else { return }
         guard let streamingHandlers else { return }
-        
+
         let process = RsyncProcessStreaming.RsyncProcess(
             arguments: arguments,
             hiddenID: config.hiddenID,
@@ -76,7 +76,7 @@ final class EstimatePull {
             SharedReference.shared.errorobject?.alert(error: error)
         }
     }
-    
+
     func pullProcessTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) async {
         // Process output
         let processedOutput: [String]? = if let output = stringoutputfromrsync, output.count > 17 {
@@ -84,13 +84,13 @@ final class EstimatePull {
         } else {
             stringoutputfromrsync
         }
-        
+
         // Create data numbers
         pullremotedatanumbers = RemoteDataNumbers(
             stringoutputfromrsync: processedOutput,
             config: config
         )
-        
+
         if isadjusted == false {
             // Create output for view
             let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
@@ -101,15 +101,15 @@ final class EstimatePull {
                 config: config
             )
         }
-        
+
         // Release current streaming before next task
         if let count = pullremotedatanumbers?.outputfromrsync?.count, count > 0 {
             pullremotedatanumbers?.maxpushpull = Double(count)
         }
-        
+
         activeStreamingProcess = nil
         streamingHandlers = nil
-        
+
         // Mark completed
         onComplete()
     }

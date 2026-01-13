@@ -14,22 +14,22 @@ final class EstimatePush {
     let config: SynchronizeConfiguration
     let isadjusted: Bool
     let reduceestimatedcount: Int = 15
-    
+
     // Streaming strong references
     var streamingHandlers: RsyncProcessStreaming.ProcessHandlers?
     var activeStreamingProcess: RsyncProcessStreaming.RsyncProcess?
     var pushremotedatanumbers: RemoteDataNumbers?
     var onComplete: () -> Void
-    
+
     init(config: SynchronizeConfiguration, isadjusted: Bool, onComplete: @escaping () -> Void) {
         self.config = config
         self.isadjusted = isadjusted
         self.onComplete = onComplete
-        self.streamingHandlers = nil
-        self.activeStreamingProcess = nil
-        self.pushremotedatanumbers = nil
+        streamingHandlers = nil
+        activeStreamingProcess = nil
+        pushremotedatanumbers = nil
     }
-    
+
     // For check remote, push remote data
     func pushRemote(config: SynchronizeConfiguration) {
         let arguments = ArgumentsSynchronize(config: config).argumentsforpushlocaltoremotewithparameters(
@@ -37,11 +37,11 @@ final class EstimatePush {
             forDisplay: false,
             keepdelete: true
         )
-        
+
         streamingHandlers = CreateStreamingHandlers().createHandlersWithCleanup(
             fileHandler: { _ in },
             processTermination: { [weak self] output, hiddenID in
-                guard let self = self else { return }
+                guard let self else { return }
                 Task { @MainActor in
                     await self.pushProcessTermination(
                         stringoutputfromrsync: output,
@@ -56,10 +56,10 @@ final class EstimatePush {
                 }
             }
         )
-        
+
         guard let arguments else { return }
         guard let streamingHandlers else { return }
-        
+
         let process = RsyncProcessStreaming.RsyncProcess(
             arguments: arguments,
             hiddenID: config.hiddenID,
@@ -74,7 +74,7 @@ final class EstimatePush {
             SharedReference.shared.errorobject?.alert(error: error)
         }
     }
-    
+
     // This is a normal synchronize task, dry-run = true
     func pushProcessTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) async {
         // Process output
@@ -83,13 +83,13 @@ final class EstimatePush {
         } else {
             stringoutputfromrsync
         }
-        
+
         // Create data numbers
         pushremotedatanumbers = RemoteDataNumbers(
             stringoutputfromrsync: processedOutput,
             config: config
         )
-        
+
         if isadjusted == false {
             // Create output for view
             let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
@@ -100,16 +100,16 @@ final class EstimatePush {
                 config: config
             )
         }
-        
+
         // Set maxpushpull if we have output
         if let count = pushremotedatanumbers?.outputfromrsync?.count, count > 0 {
             pushremotedatanumbers?.maxpushpull = Double(count)
         }
-        
+
         // Cleanup after all async work completes
         activeStreamingProcess = nil
         streamingHandlers = nil
-        
+
         // Mark completed
         onComplete()
     }

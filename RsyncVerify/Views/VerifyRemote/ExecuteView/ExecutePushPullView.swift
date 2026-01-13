@@ -1,10 +1,4 @@
-//
-//  ExecutePushPullView.swift
-//  RsyncVerify
-//
-//  Created by Thomas Evensen on 12/12/2024.
-//
-
+import Observation
 import RsyncProcessStreaming
 import SwiftUI
 
@@ -19,9 +13,7 @@ struct ExecutePushPullView: View {
     @State private var progress: Double = 0
     @State private var max: Double = 0
 
-    // Streaming strong references
-    @State private var streamingHandlers: RsyncProcessStreaming.ProcessHandlers?
-    @State private var activeStreamingProcess: RsyncProcessStreaming.RsyncProcess?
+    @State private var executionManager: PushPullExecutionManager?
 
     let config: SynchronizeConfiguration
     let pushorpullbool: Bool // True if pull data
@@ -69,6 +61,17 @@ struct ExecutePushPullView: View {
                 }
             }
         })
+        .onChange(of: executionManager?.progress) { _, newValue in
+            if let newValue {
+                progress = newValue
+            }
+        }
+        .onChange(of: executionManager?.remotedatanumbers) { _, newValue in
+            if let newValue {
+                remotedatanumbers = newValue
+                showprogressview = false
+            }
+        }
     }
 
     var executeview: some View {
@@ -80,7 +83,7 @@ struct ExecutePushPullView: View {
                         helpText: "Push to remote"
                     ) {
                         showprogressview = true
-                        push(config: config)
+                        executePush()
                     }
                 } else if pushpullcommand == .pullRemote {
                     ConditionalGlassButton(
@@ -88,7 +91,7 @@ struct ExecutePushPullView: View {
                         helpText: "Pull from remote"
                     ) {
                         showprogressview = true
-                        pull(config: config)
+                        executePull()
                     }
                 }
 
@@ -118,7 +121,6 @@ struct ExecutePushPullView: View {
                                 config: config)
                 .padding(10)
         }
-
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
@@ -126,106 +128,86 @@ struct ExecutePushPullView: View {
         .padding(10)
     }
 
-    // For a verify run, --dry-run
-    func push(config: SynchronizeConfiguration) {
-        let arguments = ArgumentsSynchronize(config: config).argumentsforpushlocaltoremotewithparameters(dryRun:
-            dryrun,
-            forDisplay: false,
-            keepdelete: keepdelete)
-
-        streamingHandlers = CreateStreamingHandlers().createHandlersWithCleanup(
-            fileHandler: fileHandler,
-            processTermination: { output, hiddenID in
-                processTermination(stringoutputfromrsync: output, hiddenID: hiddenID)
-            },
-            cleanup: { activeStreamingProcess = nil; streamingHandlers = nil }
+    private func executePush() {
+        executionManager = PushPullExecutionManager(
+            config: config,
+            dryrun: dryrun,
+            keepdelete: keepdelete
         )
 
-        guard SharedReference.shared.norsync == false else { return }
-        guard config.task != SharedReference.shared.halted else { return }
-        guard let arguments else { return }
-        guard let streamingHandlers else { return }
-
-        let process = RsyncProcessStreaming.RsyncProcess(
-            arguments: arguments,
-            hiddenID: config.hiddenID,
-            handlers: streamingHandlers,
-            useFileHandler: true
-        )
-        do {
-            try process.executeProcess()
-            activeStreamingProcess = process
-        } catch let err {
-            let error = err
-            SharedReference.shared.errorobject?.alert(error: error)
-        }
-    }
-
-    func pull(config: SynchronizeConfiguration) {
-        let arguments = ArgumentsPullRemote(config: config).argumentspullremotewithparameters(dryRun: dryrun,
-                                                                                              forDisplay: false,
-                                                                                              keepdelete: keepdelete)
-
-        streamingHandlers = CreateStreamingHandlers().createHandlersWithCleanup(
-            fileHandler: fileHandler,
-            processTermination: { output, hiddenID in
-                processTermination(stringoutputfromrsync: output, hiddenID: hiddenID)
-            },
-            cleanup: { activeStreamingProcess = nil; streamingHandlers = nil }
-        )
-
-        guard SharedReference.shared.norsync == false else { return }
-        guard config.task != SharedReference.shared.halted else { return }
-        guard let arguments else { return }
-        guard let streamingHandlers else { return }
-
-        let process = RsyncProcessStreaming.RsyncProcess(
-            arguments: arguments,
-            hiddenID: config.hiddenID,
-            handlers: streamingHandlers,
-            useFileHandler: true
-        )
-        do {
-            try process.executeProcess()
-            activeStreamingProcess = process
-        } catch let err {
-            let error = err
-            SharedReference.shared.errorobject?.alert(error: error)
-        }
-    }
-
-    func processTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) {
-        Task { @MainActor in
-            showprogressview = false
-
-            let lines = stringoutputfromrsync?.count ?? 0
-            if dryrun {
-                max = Double(lines)
+        // Update progress when manager's progress changes
+        executionManager?.onProgressUpdate = { newProgress in
+            Task { @MainActor in
+                progress = newProgress
             }
-
-            if lines > SharedReference.shared.alerttagginglines, let stringoutputfromrsync {
-                let suboutput = PrepareOutputFromRsync().prepareOutputFromRsync(stringoutputfromrsync)
-                remotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: suboutput,
-                                                      config: config)
-            } else {
-                remotedatanumbers = RemoteDataNumbers(stringoutputfromrsync: stringoutputfromrsync,
-                                                      config: config)
-            }
-
-            let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-            remotedatanumbers?.outputfromrsync = out
-
-            // Release streaming references to avoid retain cycles
-            activeStreamingProcess = nil
-            streamingHandlers = nil
         }
+
+        executionManager?.onCompletion = { result in
+            Task { @MainActor in
+                handleCompletion(result: result)
+            }
+        }
+
+        executionManager?.executePush()
     }
 
-    func fileHandler(count: Int) {
-        DispatchQueue.main.async { progress = Double(count) }
+    private func executePull() {
+        executionManager = PushPullExecutionManager(
+            config: config,
+            dryrun: dryrun,
+            keepdelete: keepdelete
+        )
+
+        executionManager?.onProgressUpdate = { newProgress in
+            Task { @MainActor in
+                progress = newProgress
+            }
+        }
+
+        executionManager?.onCompletion = { result in
+            Task { @MainActor in
+                handleCompletion(result: result)
+            }
+        }
+
+        executionManager?.executePull()
+    }
+
+    private func handleCompletion(result: PushPullExecutionResult) {
+        showprogressview = false
+
+        // Update max if it's a dry run
+        if dryrun {
+            max = Double(result.linesCount)
+        }
+
+        // Create remote data numbers based on output
+        if result.linesCount > SharedReference.shared.alerttagginglines,
+           let output = result.output {
+            let suboutput = PrepareOutputFromRsync().prepareOutputFromRsync(output)
+            remotedatanumbers = RemoteDataNumbers(
+                stringoutputfromrsync: suboutput,
+                config: config
+            )
+        } else {
+            remotedatanumbers = RemoteDataNumbers(
+                stringoutputfromrsync: result.output,
+                config: config
+            )
+        }
+
+        // Set the output for view if available
+        if let viewOutput = result.viewOutput {
+            remotedatanumbers?.outputfromrsync = viewOutput
+        }
+
+        // Clean up
+        executionManager = nil
     }
 
     func abort() {
         InterruptProcess()
+        executionManager?.abort()
+        executionManager = nil
     }
 }

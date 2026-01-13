@@ -13,7 +13,6 @@ struct PullView: View {
     @Binding var verifypath: [Verify]
     // Pull data from remote, adjusted
     @Binding var pullremotedatanumbers: RemoteDataNumbers?
-    @Binding var pullonly: Bool
     // If aborted
     @State private var isaborted: Bool = false
 
@@ -24,6 +23,7 @@ struct PullView: View {
     let config: SynchronizeConfiguration
     let isadjusted: Bool
     let reduceestimatedcount: Int = 15
+    let onComplete: () -> Void
 
     var body: some View {
         HStack {
@@ -117,9 +117,9 @@ struct PullView: View {
             activeStreamingProcess = nil
             streamingHandlers = nil
             verifypath.removeAll()
-            if pullonly == true {
-                verifypath.append(Verify(task: .pullviewonly))
-            }
+            // Mark completed
+            onComplete()
+            verifypath.append(Verify(task: .pullviewonly))
         }
     }
 

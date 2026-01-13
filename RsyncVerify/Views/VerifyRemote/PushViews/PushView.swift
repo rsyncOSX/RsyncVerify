@@ -13,7 +13,6 @@ struct PushView: View {
     @Binding var verifypath: [Verify]
     // Push data to remote, adjusted
     @Binding var pushremotedatanumbers: RemoteDataNumbers?
-    @Binding var pushonly: Bool
     // If aborted
     @State private var isaborted: Bool = false
 
@@ -117,9 +116,7 @@ struct PushView: View {
             streamingHandlers = nil
 
             verifypath.removeAll()
-            if pushonly {
-                verifypath.append(Verify(task: .pushviewonly))
-            }
+            verifypath.append(Verify(task: .pushviewonly))
         }
     }
 

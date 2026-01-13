@@ -217,7 +217,6 @@ struct VerifyRemoteView: View {
             PushView(
                 verifypath: $verifypath,
                 pushremotedatanumbers: $pushremotedatanumbers,
-                pushonly: $pushonly,
                 config: config,
                 isadjusted: isadjusted
             )
@@ -231,9 +230,9 @@ struct VerifyRemoteView: View {
             PullView(
                 verifypath: $verifypath,
                 pullremotedatanumbers: $pullremotedatanumbers,
-                pullonly: $pullonly,
                 config: config,
-                isadjusted: isadjusted
+                isadjusted: isadjusted,
+                onComplete: {}
             )
         }
     }

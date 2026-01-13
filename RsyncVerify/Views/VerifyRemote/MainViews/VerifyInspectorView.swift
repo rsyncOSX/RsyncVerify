@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct VerifyInspectorView: View {
-    @Binding var isadjusted: Bool
     @Binding var istagged: Bool
     @Binding var keepdelete: Bool
     @Binding var pushonly: Bool

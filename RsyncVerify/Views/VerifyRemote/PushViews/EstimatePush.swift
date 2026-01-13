@@ -12,7 +12,6 @@ import RsyncProcessStreaming
 @MainActor
 final class EstimatePush {
     let config: SynchronizeConfiguration
-    let isadjusted: Bool
     let reduceestimatedcount: Int = 15
 
     // Streaming strong references
@@ -21,9 +20,8 @@ final class EstimatePush {
     var pushremotedatanumbers: RemoteDataNumbers?
     var onComplete: () -> Void
 
-    init(config: SynchronizeConfiguration, isadjusted: Bool, onComplete: @escaping () -> Void) {
+    init(config: SynchronizeConfiguration, onComplete: @escaping () -> Void) {
         self.config = config
-        self.isadjusted = isadjusted
         self.onComplete = onComplete
         streamingHandlers = nil
         activeStreamingProcess = nil
@@ -90,16 +88,8 @@ final class EstimatePush {
             config: config
         )
 
-        if isadjusted == false {
-            // Create output for view
-            let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
-            pushremotedatanumbers?.outputfromrsync = out
-        } else {
-            pushremotedatanumbers = RemoteDataNumbers(
-                stringoutputfromrsync: stringoutputfromrsync,
-                config: config
-            )
-        }
+        let out = await ActorCreateOutputforView().createOutputForView(stringoutputfromrsync)
+        pushremotedatanumbers?.outputfromrsync = out
 
         // Set maxpushpull if we have output
         if let count = pushremotedatanumbers?.outputfromrsync?.count, count > 0 {

@@ -19,7 +19,6 @@ struct PullView: View {
     @State private var estimatePull: EstimatePull?
 
     let config: SynchronizeConfiguration
-    let isadjusted: Bool
     let onComplete: () -> Void
 
     var body: some View {
@@ -53,7 +52,6 @@ struct PullView: View {
     private func startPullEstimation() {
         let estimate = EstimatePull(
             config: config,
-            isadjusted: isadjusted,
             onComplete: { [self] in
                 handlePullCompletion()
             }

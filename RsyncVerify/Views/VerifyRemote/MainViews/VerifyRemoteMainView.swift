@@ -31,7 +31,6 @@ struct VerifyRemoteMainView: View {
     @State private var selecteduuids = Set<SynchronizeConfiguration.ID>()
     @State private var selectedconfig: SynchronizeConfiguration?
     @State private var selectedtaskishalted: Bool = false
-    @State private var isadjusted: Bool = false
     @State private var istagged: Bool = true
     @State private var keepdelete: Bool = false
     @State private var pushonly: Bool = false
@@ -50,7 +49,6 @@ struct VerifyRemoteMainView: View {
         }
         .inspector(isPresented: $showinspector) {
             VerifyInspectorView(
-                isadjusted: $isadjusted,
                 istagged: $istagged,
                 keepdelete: $keepdelete,
                 pushonly: $pushonly,
@@ -194,8 +192,7 @@ struct VerifyRemoteMainView: View {
                                 pushremotedatanumbers: $pushremotedatanumbers,
                                 pullremotedatanumbers: $pullremotedatanumbers,
                                 istagged: $istagged,
-                                config: config,
-                                isadjusted: isadjusted)
+                                config: config)
         }
     }
 
@@ -223,7 +220,6 @@ struct VerifyRemoteMainView: View {
                 pushremotedatanumbers: $pushremotedatanumbers,
                 pushonly: $pushonly,
                 config: config,
-                isadjusted: isadjusted,
                 onComplete: {}
             )
         }
@@ -238,7 +234,6 @@ struct VerifyRemoteMainView: View {
                 pullremotedatanumbers: $pullremotedatanumbers,
                 pullonly: $pullonly,
                 config: config,
-                isadjusted: isadjusted,
                 onComplete: {}
             )
         }

@@ -19,7 +19,6 @@ struct PushView: View {
     @State private var estimatePush: EstimatePush?
 
     let config: SynchronizeConfiguration
-    let isadjusted: Bool
     let onComplete: () -> Void
 
     var body: some View {
@@ -53,7 +52,6 @@ struct PushView: View {
     private func startPushEstimation() {
         let estimate = EstimatePush(
             config: config,
-            isadjusted: isadjusted,
             onComplete: { [self] in
                 handlePushCompletion()
             }
@@ -79,7 +77,6 @@ struct PushView: View {
             if pushonly {
                 verifypath.append(Verify(task: .pushviewonly))
             }
-
             // Clean up
             estimatePush = nil
         }

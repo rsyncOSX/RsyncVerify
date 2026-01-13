@@ -14,7 +14,14 @@ enum PushPullCommand: String, CaseIterable, Identifiable, CustomStringConvertibl
     case pushLocal
 
     var id: String { rawValue }
-    var description: String { rawValue.localizedCapitalized.replacingOccurrences(of: "_", with: " ") }
+    
+    var description: String {
+        // Insert space before uppercase letters, then capitalize each word
+        rawValue
+            .replacingOccurrences(of:  "([A-Z])", with: " $1", options: . regularExpression)
+            .trimmingCharacters(in: . whitespaces)
+            .capitalized
+    }
 }
 
 @MainActor

@@ -17,9 +17,10 @@ struct PushPullCommandView: View {
     var body: some View {
         VStack(alignment: .leading) {
             pickerselectcommand
-                .padding()
+                .padding(10)
             showcommand
         }
+        .padding()
     }
 
     var pickerselectcommand: some View {
@@ -46,6 +47,8 @@ struct PushPullCommandView: View {
 
     var commandstring: String? {
         PushPullCommandtoDisplay(display: pushpullcommand,
-                                 config: config, dryRun: dryrun, keepdelete: keepdelete).command
+                                 config: config,
+                                 dryRun: dryrun,
+                                 keepdelete: keepdelete).command
     }
 }

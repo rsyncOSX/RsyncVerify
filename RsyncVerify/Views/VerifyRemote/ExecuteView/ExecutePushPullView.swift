@@ -32,7 +32,7 @@ struct ExecutePushPullView: View {
                         let totalPull = Double(rsyncpullmax)
                         SynchronizeProgressView(max: Double(rsyncpullmax),
                                                 progress: min(Swift.max(progress, 0), totalPull),
-                                                statusText: "Push data")
+                                                statusText: "Pull Remote")
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
@@ -42,7 +42,7 @@ struct ExecutePushPullView: View {
                         let totalPush = Double(rsyncpushmax)
                         SynchronizeProgressView(max: Double(rsyncpushmax),
                                                 progress: min(Swift.max(progress, 0), totalPush),
-                                                statusText: "Pull data")
+                                                statusText: "Push Local")
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RsyncCommandView: View {
-    @State var selectedrsynccommand: RsyncCommand = .pushdata
+    @State var selectedrsynccommand: PushPullCommand = .pushLocal
 
     let config: SynchronizeConfiguration
     let keepdelete: Bool
@@ -19,7 +19,7 @@ struct RsyncCommandView: View {
                 Text("Push and Pull\ncommand strings")
 
                 Picker("", selection: $selectedrsynccommand) {
-                    ForEach(RsyncCommand.allCases) { Text($0.description)
+                    ForEach(PushPullCommand.allCases) { Text($0.description)
                         .tag($0)
                     }
                 }

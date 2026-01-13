@@ -206,8 +206,7 @@ struct VerifyRemoteView: View {
             EstimatePushandPull(verifypath: $verifypath,
                                 pushremotedatanumbers: $pushremotedatanumbers,
                                 pullremotedatanumbers: $pullremotedatanumbers,
-                                pullonly: $pullonly,
-                                pushonly: $pushonly,
+                                istagged: $istagged,
                                 config: config,
                                 isadjusted: isadjusted)
         }

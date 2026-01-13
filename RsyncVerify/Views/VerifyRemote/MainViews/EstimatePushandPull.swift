@@ -13,8 +13,8 @@ struct EstimatePushandPull: View {
     @Binding var pushremotedatanumbers: RemoteDataNumbers?
     // Pull data from remote, adjusted
     @Binding var pullremotedatanumbers: RemoteDataNumbers?
-    @Binding var pullonly: Bool
-    @Binding var pushonly: Bool
+    // tagged or not
+    @Binding var istagged: Bool
 
     let config: SynchronizeConfiguration
     let isadjusted: Bool
@@ -22,49 +22,86 @@ struct EstimatePushandPull: View {
     @State private var pullCompleted = false
     @State private var pushCompleted = false
 
+    @State private var estimatePull: EstimatePull?
+    @State private var estimatePush: EstimatePush?
+
     var body: some View {
         ZStack {
-            PullView(
-                verifypath: $verifypath,
-                pullremotedatanumbers: $pullremotedatanumbers,
-                pullonly: $pullonly,
-                config: config,
-                isadjusted: isadjusted,
-                onComplete: onCompletepull
-            )
+            if pullCompleted, pushCompleted {
+                HStack {
+                    PushDetailsSection(pushremotedatanumbers: pushremotedatanumbers,
+                                       istagged: istagged,
+                                       verifypath: $verifypath)
 
-            if pullCompleted {
-                PushView(
-                    verifypath: $verifypath,
-                    pushremotedatanumbers: $pushremotedatanumbers,
-                    pushonly: $pushonly,
-                    config: config,
-                    isadjusted: isadjusted,
-                    onComplete: onCompletepush
-                )
-            }
+                    PullDetailsSection(pullremotedatanumbers: pullremotedatanumbers,
+                                       istagged: istagged,
+                                       verifypath: $verifypath)
+                }
 
-            HStack {
-                if pullCompleted, pushCompleted {
-                    analyseView(for: pushremotedatanumbers)
-                    analyseView(for: pullremotedatanumbers)
+            } else {
+                HStack {
+                    ProgressView()
+
+                    Text("Estimating \(config.backupID) PUSH and PULL, please wait ...")
+                        .font(.title2)
                 }
             }
         }
-    }
-
-    @ViewBuilder
-    private func analyseView(for remotedatanumbers: RemoteDataNumbers?) -> some View {
-        if let output = remotedatanumbers?.outputfromrsync {
-            AsyncAnalyseView(output: output)
+        .task {
+            startPushEstimation()
+            startPullEstimation()
         }
     }
 
-    func onCompletepull() {
-        pullCompleted = true
+    func onCompletepull() { pullCompleted = true }
+
+    func onCompletepush() { pushCompleted = true }
+
+    private func startPullEstimation() {
+        let estimate = EstimatePull(
+            config: config,
+            isadjusted: isadjusted,
+            onComplete: { [self] in
+                handlePullCompletion()
+            }
+        )
+
+        estimatePull = estimate
+        estimate.pullRemote(config: config)
     }
 
-    func onCompletepush() {
-        pushCompleted = true
+    private func handlePullCompletion() {
+        Task { @MainActor in
+            // Update the binding with results from EstimatePull
+            pullremotedatanumbers = estimatePull?.pullremotedatanumbers
+            // Mark completed
+            onCompletepull()
+            // Clean up
+            estimatePull = nil
+        }
+    }
+
+    private func startPushEstimation() {
+        let estimate = EstimatePush(
+            config: config,
+            isadjusted: isadjusted,
+            onComplete: { [self] in
+                handlePushCompletion()
+            }
+        )
+
+        estimatePush = estimate
+        estimate.pushRemote(config: config)
+    }
+
+    private func handlePushCompletion() {
+        Task { @MainActor in
+            // Update the binding with results from EstimatePush
+            pushremotedatanumbers = estimatePush?.pushremotedatanumbers
+            // Mark completed
+            onCompletepush()
+            // Clean up
+            estimatePush = nil
+        }
     }
 }

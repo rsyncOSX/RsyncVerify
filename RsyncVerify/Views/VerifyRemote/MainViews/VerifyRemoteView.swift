@@ -260,7 +260,7 @@ struct VerifyRemoteView: View {
     }
 
     private var pushandpullestimated: Bool {
-        (pullremotedatanumbers?.outputfromrsync != nil &&
+        (pullremotedatanumbers?.outputfromrsync != nil ||
             pushremotedatanumbers?.outputfromrsync != nil)
     }
 }

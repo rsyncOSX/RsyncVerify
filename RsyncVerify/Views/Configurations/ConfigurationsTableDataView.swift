@@ -57,5 +57,15 @@ struct ConfigurationsTableDataView: View {
             }
             .width(min: 50, max: 90)
         }
+        .overlay {
+            if configurations?.isEmpty ?? true {
+                ContentUnavailableView {
+                    Label("RsyncVerify works only with RsyncUI.",
+                          systemImage: "doc.richtext.fill")
+                } description: {
+                    Text("Please use RsyncUI to create tasks.")
+                }
+            }
+        }
     }
 }

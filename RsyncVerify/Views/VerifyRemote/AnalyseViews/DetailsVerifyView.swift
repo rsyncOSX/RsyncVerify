@@ -138,26 +138,32 @@ struct RsyncFileChange {
             return nil
         }
 
+        struct AttributePosition {
+            let index: Int
+            let name: String
+            let code: Character?
+        }
+
         let prefix = String(record.prefix(12))
         updateType = prefix[prefix.startIndex]
         fileType = prefix[prefix.index(prefix.startIndex, offsetBy: 1)]
 
         var attrs: [RsyncAttribute] = []
-        let attributePositions: [(index: Int, name: String, code: Character?)] = [
-            (2, "checksum", "c"),
-            (3, "size", "s"),
-            (4, "time", "t"),
-            (5, "permissions", "p"),
-            (6, "owner", "o"),
-            (7, "group", "g"),
-            (8, "acl", "a"),
-            (9, "xattr", "x")
+        let attributePositions: [AttributePosition] = [
+            AttributePosition(index: 2, name: "checksum", code: "c"),
+            AttributePosition(index: 3, name: "size", code: "s"),
+            AttributePosition(index: 4, name: "time", code: "t"),
+            AttributePosition(index: 5, name: "permissions", code: "p"),
+            AttributePosition(index: 6, name: "owner", code: "o"),
+            AttributePosition(index: 7, name: "group", code: "g"),
+            AttributePosition(index: 8, name: "acl", code: "a"),
+            AttributePosition(index: 9, name: "xattr", code: "x")
         ]
 
-        for (index, name, code) in attributePositions {
-            let char = prefix[prefix.index(prefix.startIndex, offsetBy: index)]
-            if let code, char == code {
-                attrs.append(RsyncAttribute(name: name, code: char))
+        for position in attributePositions {
+            let char = prefix[prefix.index(prefix.startIndex, offsetBy: position.index)]
+            if let code = position.code, char == code {
+                attrs.append(RsyncAttribute(name: position.name, code: char))
             }
         }
 

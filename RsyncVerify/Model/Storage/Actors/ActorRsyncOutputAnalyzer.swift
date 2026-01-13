@@ -8,76 +8,6 @@
 import Foundation
 
 actor ActorRsyncOutputAnalyzer {
-    // MARK: - Data Models
-
-    struct AnalysisResult {
-        let itemizedChanges: [ItemizedChange]
-        let statistics: Statistics
-        let isDryRun: Bool
-    }
-
-    struct ItemizedChange {
-        let changeType: ChangeType
-        let path: String
-        let target: String? // For symlinks
-        let flags: ChangeFlags
-    }
-
-    enum ChangeType: String {
-        case symlink = "L"
-        case directory = "d"
-        case file = "f"
-        case device = "D"
-        case special = "S"
-        case unknown = "?"
-    }
-
-    struct ChangeFlags {
-        let fileType: String
-        let checksum: Bool // c
-        let size: Bool // s
-        let timestamp: Bool // t
-        let permissions: Bool // p
-        let owner: Bool // o
-        let group: Bool // g
-        let acl: Bool // a
-        let xattr: Bool // x
-
-        init(from flagString: String) {
-            // Format: . L...p......
-            fileType = String(flagString.prefix(2))
-            checksum = flagString.contains("c")
-            size = flagString.contains("s")
-            timestamp = flagString.contains("t")
-            permissions = flagString.contains("p")
-            owner = flagString.contains("o")
-            group = flagString.contains("g")
-            acl = flagString.contains("a")
-            xattr = flagString.contains("x")
-        }
-    }
-
-    struct Statistics {
-        let totalFiles: FileCount
-        let filesCreated: FileCount
-        let filesDeleted: Int
-        let regularFilesTransferred: Int
-        let totalFileSize: Int64
-        let totalTransferredSize: Int64
-        let literalData: Int64
-        let matchedData: Int64
-        let bytesSent: Int64
-        let bytesReceived: Int64
-        let speedup: Double
-    }
-
-    struct FileCount {
-        let total: Int
-        let regular: Int
-        let directories: Int
-        let links: Int
-    }
-
     // MARK: - Main Analysis Function
 
     func analyze(_ output: String) -> AnalysisResult? {
@@ -212,29 +142,20 @@ actor ActorRsyncOutputAnalyzer {
         var speedup = 0.0
 
         for line in lines {
-            if line.hasPrefix("Number of files:") {
-                totalFiles = parseFileCount(line)
-            } else if line.hasPrefix("Number of created files:") {
-                filesCreated = parseFileCount(line)
-            } else if line.hasPrefix("Number of deleted files:") {
-                filesDeleted = extractNumber(from: line)
-            } else if line.hasPrefix("Number of regular files transferred:") {
-                regularFilesTransferred = extractNumber(from: line)
-            } else if line.hasPrefix("Total file size:") {
-                totalFileSize = extractBytes(from: line)
-            } else if line.hasPrefix("Total transferred file size:") {
-                totalTransferredSize = extractBytes(from: line)
-            } else if line.hasPrefix("Literal data:") {
-                literalData = extractBytes(from: line)
-            } else if line.hasPrefix("Matched data:") {
-                matchedData = extractBytes(from: line)
-            } else if line.hasPrefix("Total bytes sent:") {
-                bytesSent = Int64(extractNumber(from: line))
-            } else if line.hasPrefix("Total bytes received:") {
-                bytesReceived = Int64(extractNumber(from: line))
-            } else if line.contains("speedup is") {
-                speedup = extractSpeedup(from: line)
-            }
+            parseStatisticsLine(
+                line,
+                totalFiles: &totalFiles,
+                filesCreated: &filesCreated,
+                filesDeleted: &filesDeleted,
+                regularFilesTransferred: &regularFilesTransferred,
+                totalFileSize: &totalFileSize,
+                totalTransferredSize: &totalTransferredSize,
+                literalData: &literalData,
+                matchedData: &matchedData,
+                bytesSent: &bytesSent,
+                bytesReceived: &bytesReceived,
+                speedup: &speedup
+            )
         }
 
         guard let total = totalFiles else { return nil }
@@ -252,6 +173,86 @@ actor ActorRsyncOutputAnalyzer {
             bytesReceived: bytesReceived,
             speedup: speedup
         )
+    }
+
+    // swiftlint:disable:next function_parameter_count
+    private func parseStatisticsLine(
+        _ line: String,
+        totalFiles: inout FileCount?,
+        filesCreated: inout FileCount?,
+        filesDeleted: inout Int,
+        regularFilesTransferred: inout Int,
+        totalFileSize: inout Int64,
+        totalTransferredSize: inout Int64,
+        literalData: inout Int64,
+        matchedData: inout Int64,
+        bytesSent: inout Int64,
+        bytesReceived: inout Int64,
+        speedup: inout Double
+    ) {
+        parseFileStatistics(
+            line,
+            totalFiles: &totalFiles,
+            filesCreated: &filesCreated,
+            filesDeleted: &filesDeleted,
+            regularFilesTransferred: &regularFilesTransferred
+        )
+        parseByteStatistics(
+            line,
+            totalFileSize: &totalFileSize,
+            totalTransferredSize: &totalTransferredSize,
+            literalData: &literalData,
+            matchedData: &matchedData,
+            bytesSent: &bytesSent,
+            bytesReceived: &bytesReceived,
+            speedup: &speedup
+        )
+    }
+
+    private func parseFileStatistics(
+        _ line: String,
+        totalFiles: inout FileCount?,
+        filesCreated: inout FileCount?,
+        filesDeleted: inout Int,
+        regularFilesTransferred: inout Int
+    ) {
+        if line.hasPrefix("Number of files:") {
+            totalFiles = parseFileCount(line)
+        } else if line.hasPrefix("Number of created files:") {
+            filesCreated = parseFileCount(line)
+        } else if line.hasPrefix("Number of deleted files:") {
+            filesDeleted = extractNumber(from: line)
+        } else if line.hasPrefix("Number of regular files transferred:") {
+            regularFilesTransferred = extractNumber(from: line)
+        }
+    }
+
+    // swiftlint:disable:next function_parameter_count
+    private func parseByteStatistics(
+        _ line: String,
+        totalFileSize: inout Int64,
+        totalTransferredSize: inout Int64,
+        literalData: inout Int64,
+        matchedData: inout Int64,
+        bytesSent: inout Int64,
+        bytesReceived: inout Int64,
+        speedup: inout Double
+    ) {
+        if line.hasPrefix("Total file size:") {
+            totalFileSize = extractBytes(from: line)
+        } else if line.hasPrefix("Total transferred file size:") {
+            totalTransferredSize = extractBytes(from: line)
+        } else if line.hasPrefix("Literal data:") {
+            literalData = extractBytes(from: line)
+        } else if line.hasPrefix("Matched data:") {
+            matchedData = extractBytes(from: line)
+        } else if line.hasPrefix("Total bytes sent:") {
+            bytesSent = Int64(extractNumber(from: line))
+        } else if line.hasPrefix("Total bytes received:") {
+            bytesReceived = Int64(extractNumber(from: line))
+        } else if line.contains("speedup is") {
+            speedup = extractSpeedup(from: line)
+        }
     }
 
     private func parseFileCount(_ line: String) -> FileCount {

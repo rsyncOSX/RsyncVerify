@@ -115,7 +115,7 @@ struct PushView: View {
             // Cleanup after all async work completes
             activeStreamingProcess = nil
             streamingHandlers = nil
-            
+
             verifypath.removeAll()
             if pushonly {
                 verifypath.append(Verify(task: .pushviewonly))

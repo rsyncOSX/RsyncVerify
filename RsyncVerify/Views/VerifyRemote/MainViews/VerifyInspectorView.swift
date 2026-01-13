@@ -13,33 +13,32 @@ struct VerifyInspectorView: View {
     @Binding var keepdelete: Bool
     @Binding var pushonly: Bool
     @Binding var pullonly: Bool
-    
+
     let selectedconfig: SynchronizeConfiguration?
-    
+
     var body: some View {
         VStack(alignment: .center) {
             HStack {
-                
                 VStack(alignment: .trailing) {
                     Toggle("Push only", isOn: $pushonly)
                         .toggleStyle(.switch)
                         .padding(10)
-                    
+
                     Toggle("Pull only", isOn: $pullonly)
                         .toggleStyle(.switch)
                         .padding(10)
                 }
-                
+
                 VStack(alignment: .trailing) {
                     Toggle("Tag output", isOn: $istagged)
                         .toggleStyle(.switch)
                         .padding(10)
-                    
+
                     Toggle("Adjust output", isOn: $isadjusted)
                         .toggleStyle(.switch)
                         .padding(10)
                 }
-                
+
                 Toggle("Keep delete", isOn: $keepdelete)
                     .toggleStyle(.switch)
                     .padding(10)

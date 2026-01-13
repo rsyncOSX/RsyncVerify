@@ -5,22 +5,19 @@
 //  Created by Thomas Evensen on 12/01/2026.
 //
 
-import SwiftUI
 import OSLog
+import SwiftUI
 
 struct PushDetailsSection: View {
     let pushremotedatanumbers: RemoteDataNumbers?
     let istagged: Bool
     @Binding var verifypath: [Verify]
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                
                 HStack {
-                    
                     Text("Push ") + Text(Image(systemName: "arrow.right"))
-                        
                 }
                 .font(.title2)
                 .padding()
@@ -29,7 +26,7 @@ struct PushDetailsSection: View {
                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                 )
                 .padding(10)
-                
+
                 ConditionalGlassButton(
                     systemImage: "square.and.arrow.down.fill",
                     helpText: "Save Push data to file"
@@ -58,4 +55,3 @@ struct PushDetailsSection: View {
         }
     }
 }
-

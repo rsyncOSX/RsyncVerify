@@ -28,9 +28,12 @@ struct RsyncCommandtoDisplay {
             if config.task == SharedReference.shared.halted {
                 str = "Task is halted"
             } else {
-                if let arguments = ArgumentsSynchronize(config: config).argumentsforpushlocaltoremotewithparameters(dryRun: true,
-                                                                                                                    forDisplay: true,
-                                                                                                                    keepdelete: keepdelete) {
+                if let arguments = ArgumentsSynchronize(config: config)
+                    .argumentsforpushlocaltoremotewithparameters(
+                        dryRun: true,
+                        forDisplay: true,
+                        keepdelete: keepdelete
+                    ) {
                     str = (GetfullpathforRsync().rsyncpath()) + " " + arguments.joined()
                 }
             }

@@ -5,21 +5,19 @@
 //  Created by Thomas Evensen on 12/01/2026.
 //
 
-import SwiftUI
 import OSLog
+import SwiftUI
 
 struct PullDetailsSection: View {
     let pullremotedatanumbers: RemoteDataNumbers?
     let istagged: Bool
     @Binding var verifypath: [Verify]
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 HStack {
-                    
                     Text(Image(systemName: "arrow.left")) + Text("Pull ")
-                        
                 }
                 .font(.title2)
                 .padding()
@@ -28,7 +26,6 @@ struct PullDetailsSection: View {
                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                 )
                 .padding(10)
-                
 
                 ConditionalGlassButton(
                     systemImage: "square.and.arrow.down.fill",

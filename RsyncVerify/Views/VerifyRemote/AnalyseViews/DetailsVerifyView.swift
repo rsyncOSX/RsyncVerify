@@ -34,6 +34,7 @@
 //   u = unused
 //   a = ACL changed
 //   x = extended attributes changed
+// swiftlint:disable identifier_name
 
 import SwiftUI
 
@@ -309,3 +310,5 @@ struct DetailsVerifyView: View {
         }
     }
 }
+
+// swiftlint:enable identifier_name

@@ -120,8 +120,6 @@ struct PullView: View {
             if pullonly == true {
                 verifypath.append(Verify(task: .pullviewonly))
             }
-            
-            
         }
     }
 

@@ -14,98 +14,6 @@ actor ActorRsyncOutputAnalyzer {
         let itemizedChanges: [ItemizedChange]
         let statistics: Statistics
         let isDryRun: Bool
-
-        /// Normalizes the AnalysisResult into an array of strings for display or export
-        func normalized() -> [String] {
-            var result: [String] = []
-
-            // Header
-            result.append("=== Rsync Analysis ===")
-            result.append(isDryRun ? "🔍 DRY RUN (no changes made)" : "✅ LIVE RUN")
-            result.append("")
-
-            // Statistics
-            result.append("📊 Statistics:")
-            result.append("  Total files: \(statistics.totalFiles.total)")
-            result.append("    - Regular: \(statistics.totalFiles.regular)")
-            result.append("    - Directories: \(statistics.totalFiles.directories)")
-            result.append("    - Links: \(statistics.totalFiles.links)")
-            result.append("  Files created: \(statistics.filesCreated.total)")
-            result.append("  Files deleted: \(statistics.filesDeleted)")
-            result.append("  Files transferred: \(statistics.regularFilesTransferred)")
-            result.append("")
-
-            // Data Transfer
-            result.append("💾 Data Transfer:")
-            result.append("  Total size: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.totalFileSize))")
-            result.append("  To transfer: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.totalTransferredSize))")
-            result.append("  Efficiency: \(String(format: "%.2f", ActorRsyncOutputAnalyzer.efficiencyPercentage(statistics: statistics)))% needs transfer")
-            result.append("  Literal data: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.literalData))")
-            result.append("  Matched data: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.matchedData))")
-            result.append("  Bytes sent: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.bytesSent))")
-            result.append("  Bytes received: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.bytesReceived))")
-            result.append("  Speedup: \(String(format: "%.2f", statistics.speedup))x")
-            result.append("")
-
-            // Changes Summary
-            result.append("🔄 Changes (\(itemizedChanges.count) items):")
-
-            let symlinks = itemizedChanges.filter { $0.changeType == .symlink }
-            let directories = itemizedChanges.filter { $0.changeType == .directory }
-            let files = itemizedChanges.filter { $0.changeType == .file }
-
-            if !symlinks.isEmpty {
-                result.append("  Symlinks: \(symlinks.count)")
-            }
-            if !directories.isEmpty {
-                result.append("  Directories: \(directories.count)")
-            }
-            if !files.isEmpty {
-                result.append("  Files: \(files.count)")
-            }
-            result.append("")
-
-            // Itemized Changes Details
-            if !itemizedChanges.isEmpty {
-                result.append("📝 Detailed Changes:")
-                for (index, change) in itemizedChanges.enumerated() {
-                    let changeIcon = switch change.changeType {
-                    case .symlink: "🔗"
-                    case .directory: "📁"
-                    case .file: "📄"
-                    case .device: "💿"
-                    case .special: "⚙️"
-                    case .unknown: "❓"
-                    }
-
-                    var changeLine = "  \(index + 1). \(changeIcon) \(change.path)"
-
-                    // Add flags information
-                    var flagsInfo: [String] = []
-                    if change.flags.checksum { flagsInfo.append("checksum") }
-                    if change.flags.size { flagsInfo.append("size") }
-                    if change.flags.timestamp { flagsInfo.append("time") }
-                    if change.flags.permissions { flagsInfo.append("perms") }
-                    if change.flags.owner { flagsInfo.append("owner") }
-                    if change.flags.group { flagsInfo.append("group") }
-                    if change.flags.acl { flagsInfo.append("acl") }
-                    if change.flags.xattr { flagsInfo.append("xattr") }
-
-                    if !flagsInfo.isEmpty {
-                        changeLine += " [\(flagsInfo.joined(separator: ", "))]"
-                    }
-
-                    // Add target for symlinks
-                    if let target = change.target {
-                        changeLine += " -> \(target)"
-                    }
-
-                    result.append(changeLine)
-                }
-            }
-
-            return result
-        }
     }
 
     struct ItemizedChange {
@@ -433,7 +341,8 @@ extension ActorRsyncOutputAnalyzer.AnalysisResult: CustomStringConvertible {
         result += "💾 Data Transfer:\n"
         result += "  Total size: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.totalFileSize))\n"
         result += "  To transfer: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.totalTransferredSize))\n"
-        result += "  Efficiency: \(String(format: "%.2f", ActorRsyncOutputAnalyzer.efficiencyPercentage(statistics: statistics)))% needs transfer\n"
+        let efficiency = ActorRsyncOutputAnalyzer.efficiencyPercentage(statistics: statistics)
+        result += "  Efficiency: \(String(format: "%.2f", efficiency))% needs transfer\n"
         result += "  Speedup: \(String(format: "%.2f", statistics.speedup))x\n\n"
 
         result += "🔄 Changes (\(itemizedChanges.count) items):\n"

@@ -20,7 +20,7 @@ struct VerifyToolbarContent: ToolbarContent {
     @Binding var selectedconfigBinding: SynchronizeConfiguration?
     @Binding var pushonly: Bool
     @Binding var pullonly: Bool
-    
+
     var body: some ToolbarContent {
         ToolbarItem {
             if pushandpullestimated == false {
@@ -37,7 +37,6 @@ struct VerifyToolbarContent: ToolbarContent {
                     } else {
                         verifypath.append(Verify(task: .pushview(configID: selectedconfig.id)))
                     }
-                    
                 }
                 .disabled(disabledpushpull)
             }

@@ -54,7 +54,8 @@ struct VerifyRemoteView: View {
                 keepdelete: $keepdelete,
                 pushonly: $pushonly,
                 pullonly: $pullonly,
-                selectedconfig: selectedconfig)
+                selectedconfig: selectedconfig
+            )
             .inspectorColumnWidth(min: 400, ideal: 500, max: 600)
         }
         .toolbar {
@@ -74,7 +75,7 @@ struct VerifyRemoteView: View {
             )
         }
     }
-    
+
     private var sidebarContent: some View {
         VStack {
             Picker("", selection: $selectedprofileID) {
@@ -93,7 +94,7 @@ struct VerifyRemoteView: View {
             rsyncVersionMessage
         }
     }
-    
+
     private var rsyncVersionMessage: some View {
         Group {
             if SharedReference.shared.rsyncversion3 {
@@ -103,16 +104,16 @@ struct VerifyRemoteView: View {
             }
         }
     }
-    
+
     private var detailContent: some View {
         NavigationStack(path: $verifypath) {
-            if verifypath.isEmpty  { configurationsTableView }
+            if verifypath.isEmpty { configurationsTableView }
         }
         .navigationDestination(for: Verify.self) { which in
             makeView(view: which.task)
         }
     }
-    
+
     private var configurationsTableView: some View {
         ConfigurationsTableDataView(
             selecteduuids: $selecteduuids,
@@ -122,10 +123,10 @@ struct VerifyRemoteView: View {
             handleConfigurationSelection()
         }
     }
-    
+
     private func handleConfigurationSelection() {
         guard let configurations = rsyncUIdata.configurations else { return }
-        
+
         if let index = configurations.firstIndex(where: { $0.id == selecteduuids.first }) {
             guard selectedconfig?.task != SharedReference.shared.halted else { return }
             selectedconfig = configurations[index]
@@ -194,7 +195,7 @@ struct VerifyRemoteView: View {
                                verifypath: $verifypath)
         }
     }
-    
+
     @ViewBuilder
     private func executePushPullView(for configuuid: SynchronizeConfiguration.ID) -> some View {
         if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
@@ -208,7 +209,7 @@ struct VerifyRemoteView: View {
             )
         }
     }
-    
+
     @ViewBuilder
     private func pushView(for configuuid: SynchronizeConfiguration.ID) -> some View {
         if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
@@ -222,7 +223,7 @@ struct VerifyRemoteView: View {
             )
         }
     }
-    
+
     @ViewBuilder
     private func pullView(for configuuid: SynchronizeConfiguration.ID) -> some View {
         if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
@@ -236,7 +237,7 @@ struct VerifyRemoteView: View {
             )
         }
     }
-    
+
     @ViewBuilder
     private func analyseView(for remotedatanumbers: RemoteDataNumbers?) -> some View {
         if let output = remotedatanumbers?.outputfromrsync {

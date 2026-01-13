@@ -17,16 +17,7 @@ struct RsyncAnalysisView: View {
         VStack(spacing: 0) {
             // Header with run type
             runTypeHeader
-/*
-            // Tab selection
-            Picker("", selection: $selectedTab) {
-                Text("Overview").tag(0)
-                Text("Changes").tag(1)
-                Text("Statistics").tag(2)
-            }
-            .pickerStyle(.segmented)
-            .padding()
-     */
+            
             // Content based on selected tab
             TabView(selection: $selectedTab) {
                 overviewView

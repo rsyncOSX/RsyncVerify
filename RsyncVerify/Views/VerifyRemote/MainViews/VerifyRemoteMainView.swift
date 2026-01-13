@@ -57,7 +57,7 @@ struct VerifyRemoteMainView: View {
                 pullonly: $pullonly,
                 selectedconfig: selectedconfig
             )
-            .inspectorColumnWidth(min: 400, ideal: 500, max: 600)
+            .inspectorColumnWidth(min: 200, ideal: 300, max: 350)
         }
         .toolbar {
             VerifyToolbarContent(
@@ -157,41 +157,6 @@ struct VerifyRemoteMainView: View {
             selectedconfig = nil
             verifypath.removeAll()
             showinspector = false
-        }
-    }
-
-    @MainActor
-    private func prepareadjustedoutput() {
-        Task.detached { [pushremotedatanumbers, pullremotedatanumbers] in
-            let reduceestimatedcount = 15
-
-            let pushRaw = pushremotedatanumbers?.preparedoutputfromrsync
-            let pullRaw = pullremotedatanumbers?.preparedoutputfromrsync
-
-            var rsyncpushmax = (pushRaw?.count ?? 0) - reduceestimatedcount
-            if rsyncpushmax < 0 { rsyncpushmax = 0 }
-
-            var rsyncpullmax = (pullRaw?.count ?? 0) - reduceestimatedcount
-            if rsyncpullmax < 0 { rsyncpullmax = 0 }
-
-            let local = ObservableVerifyRemotePushPull()
-            local.outputrsyncpushraw = pushRaw
-            local.outputrsyncpullraw = pullRaw
-            local.rsyncpushmax = rsyncpushmax
-            local.rsyncpullmax = rsyncpullmax
-
-            await local.adjustoutput()
-            let adjustedPull = local.adjustedpull
-            let adjustedPush = local.adjustedpush
-
-            async let outPull = ActorCreateOutputforView().createOutputForView(adjustedPull)
-            async let outPush = ActorCreateOutputforView().createOutputForView(adjustedPush)
-            let (pull, push) = await (outPull, outPush)
-
-            await MainActor.run {
-                self.pullremotedatanumbers?.outputfromrsync = pull
-                self.pushremotedatanumbers?.outputfromrsync = push
-            }
         }
     }
 

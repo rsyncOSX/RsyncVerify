@@ -18,8 +18,7 @@ struct VerifyToolbarContent: ToolbarContent {
     @Binding var selectedconfigBinding: SynchronizeConfiguration?
 
     var body: some ToolbarContent {
-        
-        if pushandpullestimated == true {
+        if pushandpullestimated == true, !verifypath.contains(where: { if case .executenpushpullview = $0.task { true } else { false } }) {
             ToolbarItem {
                 ConditionalGlassButton(
                     systemImage: "figure.run",

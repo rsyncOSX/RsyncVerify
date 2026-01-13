@@ -104,12 +104,10 @@ struct VerifyRemoteView: View {
 
     private var detailContent: some View {
         NavigationStack(path: $verifypath) {
-            
             ZStack {
-              
                 if verifypath.isEmpty { configurationsTableView }
-                
-                if pushandpullestimated == false && selecteduuids.isEmpty == false {
+
+                if pushandpullestimated == false, selecteduuids.isEmpty == false {
                     ConditionalGlassButton(
                         systemImage: "play.fill",
                         helpText: "Verify selected"

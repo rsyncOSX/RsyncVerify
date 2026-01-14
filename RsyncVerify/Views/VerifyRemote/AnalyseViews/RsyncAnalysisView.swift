@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import RsyncAnalyse
 
 struct RsyncAnalysisView: View {
-    let analysisResult: ActorRsyncOutputAnalyzer.AnalysisResult
+    let analysisResult: ActorRsyncOutputAnalyser.AnalysisResult
     @State private var selectedTab = 0
     @State private var searchText = ""
-    @State private var selectedChangeTypes: Set<ActorRsyncOutputAnalyzer.ChangeType> = []
+    @State private var selectedChangeTypes: Set<ActorRsyncOutputAnalyser.ChangeType> = []
 
     var body: some View {
         VStack(spacing: 0) {

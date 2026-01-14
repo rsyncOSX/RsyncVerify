@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import RsyncAnalyse
 
 struct AsyncAnalyseView: View {
     let output: [RsyncOutputData]
-    @State private var analyse: ActorRsyncOutputAnalyzer.AnalysisResult?
+    @State private var analyse: ActorRsyncOutputAnalyser.AnalysisResult?
 
     var body: some View {
         Group {
@@ -20,7 +21,10 @@ struct AsyncAnalyseView: View {
             }
         }
         .task {
-            analyse = await ActorRsyncOutputAnalyzer().analyze(output)
+            guard !output.isEmpty else { return }
+            let stringData = output.map(\.record).joined(separator: "\n")
+            analyse = await ActorRsyncOutputAnalyser().analyze(stringData)
         }
     }
 }
+

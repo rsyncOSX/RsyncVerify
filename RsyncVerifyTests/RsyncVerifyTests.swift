@@ -456,13 +456,17 @@ struct IntegrationTests {
         #expect(result?.statistics.warnings.count == 1)
 
         // Verify change types
-        let changesByType = await analyzer.changesByType(for: result!)
+        guard let validResult = result else {
+            Issue.record("Result should not be nil")
+            return
+        }
+        let changesByType = await analyzer.changesByType(for: validResult)
         #expect(changesByType[.file] ?? 0 > 0)
         #expect(changesByType[.symlink] ?? 0 > 0)
         #expect(changesByType[.deletion] ?? 0 > 0)
 
         // Verify summary generation
-        let summary = await analyzer.summary(for: result!)
+        let summary = await analyzer.summary(for: validResult)
         #expect(summary.contains("RSYNC ANALYSIS SUMMARY"))
         #expect(summary.contains("Total items: 6"))
 
@@ -474,5 +478,128 @@ struct IntegrationTests {
         #expect(result?.statistics.totalTransferredSize == 2_621_440)
         #expect(result?.statistics.literalData == 1_048_576)
         #expect(result?.statistics.matchedData == 1_572_864)
+    }
+}
+
+// MARK: - Performance Tests
+
+struct PerformanceTests {
+    private let analyzer = ActorRsyncOutputAnalyzer()
+
+    @Test("Performance with 10k lines", .timeLimit(.seconds(5)))
+    func performance10kLines() async {
+        let largeOutput = generateLargeOutput(lines: 10000)
+        let result = await analyzer.analyze(largeOutput)
+        #expect(result != nil)
+        #expect(result?.itemizedChanges.count > 0)
+    }
+
+    @Test("Performance with 50k lines", .timeLimit(.seconds(15)))
+    func performance50kLines() async {
+        let largeOutput = generateLargeOutput(lines: 50000)
+        let result = await analyzer.analyze(largeOutput)
+        #expect(result != nil)
+    }
+
+    @Test("Performance with 100k lines", .timeLimit(.seconds(30)))
+    func performance100kLines() async {
+        let largeOutput = generateLargeOutput(lines: 100_000)
+        let result = await analyzer.analyze(largeOutput)
+        #expect(result != nil)
+    }
+
+    @Test("Cache performance improvement")
+    func cachePerformance() async {
+        let mediumOutput = generateLargeOutput(lines: 5000)
+
+        // First parse (no cache)
+        let start1 = Date()
+        _ = await analyzer.analyzeCached(mediumOutput)
+        let duration1 = Date().timeIntervalSince(start1)
+
+        // Second parse (with cache)
+        let start2 = Date()
+        _ = await analyzer.analyzeCached(mediumOutput)
+        let duration2 = Date().timeIntervalSince(start2)
+
+        // Cached version should be significantly faster
+        #expect(duration2 < duration1 * 0.1) // At least 10x faster
+
+        await analyzer.clearCache()
+    }
+
+    @Test("Concurrent analysis performance", .timeLimit(.seconds(10)))
+    func concurrentAnalysis() async {
+        let output = generateLargeOutput(lines: 1000)
+
+        await withTaskGroup(of: Bool.self) { group in
+            for _ in 0 ..< 50 {
+                group.addTask {
+                    let result = await analyzer.analyze(output)
+                    return result != nil
+                }
+            }
+
+            var successCount = 0
+            for await success in group where success {
+                successCount += 1
+            }
+
+            #expect(successCount == 50)
+        }
+    }
+
+    @Test("Memory efficiency with repeated parsing")
+    func memoryEfficiency() async {
+        // Parse and discard many outputs to test memory management
+        for _ in 0 ..< 100 {
+            let output = generateLargeOutput(lines: 1000)
+            let result = await analyzer.analyze(output)
+            #expect(result != nil)
+        }
+        // If we get here without memory issues, test passes
+    }
+
+    // MARK: - Helper Methods
+
+    private func generateLargeOutput(lines: Int) -> String {
+        var output = ""
+
+        // Generate various types of changes
+        let changeTypes = [
+            ".f..t.......",
+            ">f.stp......",
+            ".d..t.......",
+            ".L..t.......",
+            "*deleting"
+        ]
+
+        for lineIndex in 0 ..< lines {
+            if lineIndex % 1000 == 0 {
+                // Add some variety
+                let changeType = changeTypes.randomElement() ?? ".f..t......."
+                output += changeType + " file_\(lineIndex).txt\n"
+            } else {
+                output += ".f..t....... file_\(lineIndex).txt\n"
+            }
+        }
+
+        // Add statistics section
+        output += """
+
+        Number of files: \(lines) (reg: \(lines - 100), dir: 80, link: 20)
+        Number of created files: \(lines / 10) (reg: \(lines / 10), dir: 0, link: 0)
+        Number of deleted files: \(lines / 20)
+        Number of regular files transferred: \(lines / 5)
+        Total file size: \(lines * 1024) bytes
+        Total transferred file size: \(lines * 512) bytes
+        Literal data: \(lines * 256) bytes
+        Matched data: \(lines * 256) bytes
+        Total bytes sent: \(lines * 512)
+        Total bytes received: \(lines * 256)
+        speedup is 2.00
+        """
+
+        return output
     }
 }

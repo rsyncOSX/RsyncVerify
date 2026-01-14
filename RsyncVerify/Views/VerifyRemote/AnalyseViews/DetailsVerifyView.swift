@@ -7,51 +7,125 @@
 
 import SwiftUI
 
-struct RsyncFileChange {
-    let rawPrefix: String
+// MARK: - Unified Rsync Output Parser
+
+/// Unified parser for rsync itemized output format.
+/// Handles both strict 12-character format and whitespace-separated format.
+struct RsyncOutputRecord {
     let path: String
     let updateType: Character
     let fileType: Character
     let attributes: [RsyncAttribute]
 
+    /// Initialize with explicit values
+    init(path: String, updateType: Character, fileType: Character, attributes: [RsyncAttribute]) {
+        self.path = path
+        self.updateType = updateType
+        self.fileType = fileType
+        self.attributes = attributes
+    }
+
+    /// Parse rsync output record with automatic format detection
+    /// - Parameter record: Raw rsync output line
+    /// - Note: Supports both strict format (".f..t....... file.txt") and flexible format ("*deleting file.txt")
     init?(from record: String) {
-        // Expect format like: ".d..t....... ./"
-        // Position 0: update type (. * + - > h ? etc)
-        // Position 1: file type (f d L D S)
-        // Position 2-11: attribute codes
-        guard record.count >= 13 else { return nil }
-
-        let chars = Array(record)
-        guard chars.count >= 12, chars[12] == " " else { return nil }
-
-        let prefix = String(chars.prefix(12))
-        updateType = chars[0]
-        fileType = chars[1]
-
-        var attrs: [RsyncAttribute] = []
-        let attributePositions: [(index: Int, name: String, code: Character?)] = [
-            (2, "checksum", "c"),
-            (3, "size", "s"),
-            (4, "time", "t"),
-            (5, "permissions", "p"),
-            (6, "owner", "o"),
-            (7, "group", "g"),
-            (8, "acl", "a"),
-            (9, "xattr", "x")
-        ]
-
-        for position in attributePositions {
-            guard position.index < chars.count else { continue }
-            let char = chars[position.index]
-            if let code = position.code, char == code {
-                attrs.append(RsyncAttribute(name: position.name, code: char))
-            }
+        // Handle deletion format first
+        if record.hasPrefix("*deleting") {
+            updateType = "-"
+            fileType = "f"
+            attributes = []
+            path = record.replacingOccurrences(of: "*deleting", with: "").trimmingCharacters(in: .whitespaces)
+            return
         }
 
-        rawPrefix = prefix
-        path = String(chars.dropFirst(13)).trimmingCharacters(in: .whitespaces)
-        attributes = attrs
+        // Try strict 12-character format first (most common)
+        if record.count >= 13, let parsed = Self.parseStrictFormat(record) {
+            self = parsed
+            return
+        }
+
+        // Fall back to flexible whitespace-separated format
+        if let parsed = Self.parseFlexibleFormat(record) {
+            self = parsed
+            return
+        }
+
+        return nil
     }
+
+    // MARK: - Parsing Methods
+
+    /// Parse strict 12-character rsync format: ".f..t....... file.txt"
+    private static func parseStrictFormat(_ record: String) -> RsyncOutputRecord? {
+        let chars = Array(record)
+        guard chars.count >= 13, chars[12] == Character(" ") else { return nil }
+
+        let updateType = chars[0]
+        let fileType = chars[1]
+
+        var attrs: [RsyncAttribute] = []
+        let attributePositions = [
+            (index: 2, name: "checksum", code: Character("c")),
+            (index: 3, name: "size", code: Character("s")),
+            (index: 4, name: "time", code: Character("t")),
+            (index: 5, name: "permissions", code: Character("p")),
+            (index: 6, name: "owner", code: Character("o")),
+            (index: 7, name: "group", code: Character("g")),
+            (index: 8, name: "acl", code: Character("a")),
+            (index: 9, name: "xattr", code: Character("x"))
+        ]
+
+        for position in attributePositions where position.index < chars.count && chars[position.index] == position.code {
+            attrs.append(RsyncAttribute(name: position.name, code: position.code))
+        }
+
+        let path = String(chars.dropFirst(13)).trimmingCharacters(in: .whitespaces)
+
+        return RsyncOutputRecord(
+            path: path,
+            updateType: updateType,
+            fileType: fileType,
+            attributes: attrs
+        )
+    }
+
+    /// Parse flexible whitespace-separated format: ">f.stp file.txt"
+    private static func parseFlexibleFormat(_ record: String) -> RsyncOutputRecord? {
+        let components = record.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+        guard components.count >= 2 else { return nil }
+
+        let flagChars = Array(components[0])
+        guard flagChars.count >= 2 else { return nil }
+
+        let updateType = flagChars[0]
+        let fileType = flagChars[1]
+        let path = components.dropFirst().joined(separator: " ")
+
+        var attrs: [RsyncAttribute] = []
+        let attributeMapping: [(code: Character, name: String)] = [
+            (Character("c"), "checksum"),
+            (Character("s"), "size"),
+            (Character("t"), "time"),
+            (Character("p"), "permissions"),
+            (Character("o"), "owner"),
+            (Character("g"), "group"),
+            (Character("a"), "acl"),
+            (Character("x"), "xattr")
+        ]
+
+        for (code, name) in attributeMapping where flagChars.dropFirst(2).contains(code) {
+            attrs.append(RsyncAttribute(name: name, code: code))
+        }
+
+        return RsyncOutputRecord(
+            path: path,
+            updateType: updateType,
+            fileType: fileType,
+            attributes: attrs
+        )
+    }
+
+    // MARK: - Computed Properties
 
     var fileTypeLabel: String {
         switch fileType {
@@ -64,7 +138,7 @@ struct RsyncFileChange {
         }
     }
 
-    var updateTypeLabel: (String, Color) {
+    var updateTypeLabel: (text: String, color: Color) {
         switch updateType {
         case ".": ("NONE", .gray)
         case "*": ("UPDATED", .orange)
@@ -85,107 +159,7 @@ struct RsyncAttribute: Identifiable {
     let code: Character
 }
 
-// MARK: - Fallback ItemizedChange Parser
-
-struct ItemizedChange {
-    let path: String
-    let updateType: Character
-    let fileType: Character
-    let changedAttributes: [String]
-
-    init?(from record: String) {
-        let components = record.components(separatedBy: .whitespaces)
-            .filter { !$0.isEmpty }
-
-        guard components.count >= 2 else { return nil }
-
-        let flagString = components[0]
-        let flagChars = Array(flagString)
-
-        guard flagChars.count >= 2 else { return nil }
-
-        updateType = flagChars[0]
-        fileType = flagChars[1]
-        path = components.dropFirst().joined(separator: " ")
-
-        // Parse changed attributes from flag string positions 2+
-        var attributes: [String] = []
-        if flagChars.count > 2 {
-            let attributeMapping: [Character: String] = [
-                "c": "checksum",
-                "s": "size",
-                "t": "time",
-                "p": "permissions",
-                "o": "owner",
-                "g": "group",
-                "a": "acl",
-                "x": "xattr"
-            ]
-
-            for char in flagChars.dropFirst(2) {
-                if let attributeName = attributeMapping[char] {
-                    attributes.append(attributeName)
-                }
-            }
-        }
-
-        changedAttributes = attributes
-    }
-
-    var updateDescription: (String, Color) {
-        switch updateType {
-        case ".": ("UNCHANGED", .gray)
-        case "*": ("UPDATED", .orange)
-        case "+": ("CREATED", .green)
-        case "-": ("DELETED", .red)
-        case ">": ("TRANSFERRED", .blue)
-        case "<": ("SENT", .purple)
-        case "h": ("HARDLINK", .indigo)
-        case "?": ("ERROR", .red)
-        default: (String(updateType), .primary)
-        }
-    }
-
-    var fileTypeDescription: String {
-        switch fileType {
-        case "f": "file"
-        case "d": "dir"
-        case "L": "link"
-        case "D": "device"
-        case "S": "special"
-        default: String(fileType)
-        }
-    }
-}
-
-// MARK: - Color Definitions for non-SwiftUI contexts
-
-#if canImport(SwiftUI)
-    import SwiftUI
-#else
-    struct Color {
-        static let orange = Color()
-        static let red = Color()
-        static let green = Color()
-        static let blue = Color()
-        static let purple = Color()
-        static let indigo = Color()
-        static let gray = Color()
-        static let primary = Color()
-        static let secondary = Color()
-
-        private init() {}
-    }
-#endif
-
-// MARK: - SwiftUI View
-
-//
-//  DetailsVerifyView.swift
-//  RsyncVerify
-//
-//  Created by Thomas Evensen on 11/01/2026.
-//
+// MARK: - SwiftUI View Components
 
 struct DetailsVerifyView: View {
     let remotedatanumbers: RemoteDataNumbers
@@ -196,7 +170,7 @@ struct DetailsVerifyView: View {
             if istagged {
                 Table(records) {
                     TableColumn("Output from rsync (\(records.count) rows)") { data in
-                        parseRecordRow(data.record)
+                        RsyncOutputRowView(record: data.record)
                     }
                 }
             } else {
@@ -213,108 +187,97 @@ struct DetailsVerifyView: View {
                 .foregroundColor(.secondary)
         }
     }
+}
 
-    @ViewBuilder
-    private func parseRecordRow(_ record: String) -> some View {
-        if record.contains("*deleting") {
-            HStack(spacing: 4) {
-                Text("DELETE")
-                    .foregroundColor(.white)
-                    .font(.caption.bold())
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Color.red)
-                    .cornerRadius(4)
-                Text(record)
-                    .font(.caption)
-                    .textSelection(.enabled)
-            }
-        } else if let rsyncChange = RsyncFileChange(from: record) {
-            // Enhanced rsync output with detailed attributes
-            HStack(spacing: 6) {
-                // Update type tag
-                let (updateText, updateColor) = rsyncChange.updateTypeLabel
-                Text(updateText)
-                    .foregroundColor(.white)
-                    .font(.caption.bold())
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(updateColor)
-                    .cornerRadius(4)
+// MARK: - Row View Component
 
-                // File type tag
-                Text(rsyncChange.fileTypeLabel)
-                    .foregroundColor(.secondary)
-                    .font(.caption)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(3)
+struct RsyncOutputRowView: View {
+    let record: String
 
-                // Changed attributes
-                if !rsyncChange.attributes.isEmpty {
-                    ForEach(rsyncChange.attributes) { attr in
-                        Text(attr.name)
-                            .foregroundColor(.orange)
-                            .font(.caption2)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 2)
-                            .background(Color.orange.opacity(0.15))
-                            .cornerRadius(3)
-                    }
-                }
-
-                // Path
-                Text(rsyncChange.path)
-                    .lineLimit(1)
-                    .font(.caption)
-                    .textSelection(.enabled)
-            }
-        } else if let change = ItemizedChange(from: record) {
-            // Fallback to simplified parser
-            HStack(spacing: 6) {
-                // Update type tag
-                let (updateText, updateColor) = change.updateDescription
-                Text(updateText)
-                    .foregroundColor(.white)
-                    .font(.caption.bold())
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(updateColor)
-                    .cornerRadius(4)
-
-                // File type tag
-                Text(change.fileTypeDescription)
-                    .foregroundColor(.secondary)
-                    .font(.caption)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(3)
-
-                // Changed attributes
-                if !change.changedAttributes.isEmpty {
-                    ForEach(change.changedAttributes, id: \.self) { attr in
-                        Text(attr)
-                            .foregroundColor(.orange)
-                            .font(.caption2)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 2)
-                            .background(Color.orange.opacity(0.15))
-                            .cornerRadius(3)
-                    }
-                }
-
-                // Path
-                Text(change.path)
-                    .lineLimit(1)
-                    .font(.caption)
-                    .textSelection(.enabled)
-            }
+    var body: some View {
+        if let parsed = RsyncOutputRecord(from: record) {
+            ParsedRsyncRow(parsed: parsed)
         } else {
+            // Unparseable output - show as plain text
             Text(record)
                 .font(.caption)
                 .textSelection(.enabled)
         }
+    }
+}
+
+// MARK: - Parsed Row Component
+
+struct ParsedRsyncRow: View {
+    let parsed: RsyncOutputRecord
+
+    var body: some View {
+        HStack(spacing: 6) {
+            // Update type tag
+            UpdateTypeTag(updateTypeLabel: parsed.updateTypeLabel)
+
+            // File type tag
+            FileTypeTag(fileTypeLabel: parsed.fileTypeLabel)
+
+            // Changed attributes
+            if !parsed.attributes.isEmpty {
+                ForEach(parsed.attributes) { attr in
+                    AttributeBadge(name: attr.name)
+                }
+            }
+
+            // Path
+            Text(parsed.path)
+                .lineLimit(1)
+                .font(.caption)
+                .textSelection(.enabled)
+        }
+    }
+}
+
+// MARK: - Reusable Tag Components
+
+struct UpdateTypeTag: View {
+    let updateTypeLabel: (text: String, color: Color)
+
+    var body: some View {
+        Text(updateTypeLabel.text)
+            .foregroundColor(.white)
+            .font(.caption.bold())
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(updateTypeLabel.color)
+            .cornerRadius(4)
+            .accessibilityLabel("Update type: \(updateTypeLabel.text)")
+    }
+}
+
+struct FileTypeTag: View {
+    let fileTypeLabel: String
+
+    var body: some View {
+        Text(fileTypeLabel)
+            .foregroundColor(.secondary)
+            .font(.caption)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 2)
+            .background(Color.secondary.opacity(0.1))
+            .cornerRadius(3)
+            .accessibilityLabel("File type: \(fileTypeLabel)")
+    }
+}
+
+struct AttributeBadge: View {
+    let name: String
+
+    var body: some View {
+        Text(name)
+            .foregroundColor(.orange)
+            .font(.caption2)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 2)
+            .background(Color.orange.opacity(0.15))
+            .cornerRadius(3)
+            .accessibilityLabel("Changed attribute: \(name)")
     }
 }

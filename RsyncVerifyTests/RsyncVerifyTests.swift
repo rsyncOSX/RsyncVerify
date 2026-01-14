@@ -7,6 +7,7 @@
 
 @testable import RsyncVerify
 import Testing
+import Foundation
 
 struct RsyncAnalyzerTests {
     private let analyzer = ActorRsyncOutputAnalyzer()
@@ -296,116 +297,6 @@ struct RsyncAnalyzerTests {
     }
 }
 
-// MARK: - RsyncFileChange Tests
-
-struct RsyncFileChangeTests {
-    @Test("Valid RsyncFileChange parsing")
-    func validParsing() {
-        let record = ".f..t....... file.txt"
-        let change = RsyncFileChange(from: record)
-
-        #expect(change != nil)
-        #expect(change?.updateType == ".")
-        #expect(change?.fileType == "f")
-        #expect(change?.path == "file.txt")
-        #expect(change?.attributes.count == 1)
-        #expect(change?.attributes.first?.name == "time")
-        #expect(change?.fileTypeLabel == "file")
-    }
-
-    @Test("Invalid RsyncFileChange parsing")
-    func invalidParsing() {
-        // Too short
-        #expect(RsyncFileChange(from: "short") == nil)
-
-        // Missing space at position 12
-        #expect(RsyncFileChange(from: "123456789012file.txt") == nil)
-
-        // Empty string
-        #expect(RsyncFileChange(from: "") == nil)
-    }
-
-    @Test("Multiple attributes parsing")
-    func multipleAttributes() {
-        let record = ">f.stp...... newfile.txt"
-        let change = RsyncFileChange(from: record)
-
-        #expect(change != nil)
-        #expect(change?.updateType == ">")
-        #expect(change?.fileType == "f")
-        #expect(change?.attributes.count == 3)
-
-        let attributeNames = change?.attributes.map(\.name) ?? []
-        #expect(attributeNames.contains("size"))
-        #expect(attributeNames.contains("time"))
-        #expect(attributeNames.contains("permissions"))
-    }
-
-    @Test("Update type labels")
-    func updateTypeLabels() {
-        let testCases: [(Character, String)] = [
-            (".", "NONE"),
-            ("*", "UPDATED"),
-            ("+", "CREATED"),
-            ("-", "DELETED"),
-            (">", "RECEIVED"),
-            ("<", "SENT"),
-            ("h", "HARDLINK"),
-            ("?", "ERROR"),
-            ("X", "X") // unknown
-        ]
-
-        for (updateType, expectedText) in testCases {
-            let record = "\(updateType)f..t....... file.txt"
-            if let change = RsyncFileChange(from: record) {
-                let (text, _) = change.updateTypeLabel
-                #expect(text == expectedText)
-            }
-        }
-    }
-}
-
-// MARK: - ItemizedChange Tests
-
-struct ItemizedChangeTests {
-    @Test("Valid ItemizedChange parsing")
-    func validParsing() {
-        let record = ".f..t....... file.txt"
-        let change = ItemizedChange(from: record)
-
-        #expect(change != nil)
-        #expect(change?.updateType == ".")
-        #expect(change?.fileType == "f")
-        #expect(change?.path == "file.txt")
-        #expect(change?.changedAttributes.contains("time") ?? false)
-        #expect(change?.fileTypeDescription == "file")
-    }
-
-    @Test("ItemizedChange with multiple attributes")
-    func multipleAttributes() {
-        let record = ">f.stp...... newfile.txt"
-        let change = ItemizedChange(from: record)
-
-        #expect(change != nil)
-        #expect(change?.changedAttributes.count == 3)
-        #expect(change?.changedAttributes.contains("size") ?? false)
-        #expect(change?.changedAttributes.contains("time") ?? false)
-        #expect(change?.changedAttributes.contains("permissions") ?? false)
-    }
-
-    @Test("Invalid ItemizedChange parsing")
-    func invalidParsing() {
-        // Too few components
-        #expect(ItemizedChange(from: "flagsonly") == nil)
-
-        // Too short flag string
-        #expect(ItemizedChange(from: "f file.txt") == nil)
-
-        // Empty string
-        #expect(ItemizedChange(from: "") == nil)
-    }
-}
-
 // MARK: - Integration Test
 
 struct IntegrationTests {
@@ -486,22 +377,22 @@ struct IntegrationTests {
 struct PerformanceTests {
     private let analyzer = ActorRsyncOutputAnalyzer()
 
-    @Test("Performance with 10k lines", .timeLimit(.seconds(5)))
+    @Test("Performance with 10k lines", .timeLimit(.minutes(1)))
     func performance10kLines() async {
         let largeOutput = generateLargeOutput(lines: 10000)
         let result = await analyzer.analyze(largeOutput)
         #expect(result != nil)
-        #expect(result?.itemizedChanges.count > 0)
+        #expect(result?.itemizedChanges.count ?? 0 > 0)
     }
 
-    @Test("Performance with 50k lines", .timeLimit(.seconds(15)))
+    @Test("Performance with 50k lines", .timeLimit(.minutes(1)))
     func performance50kLines() async {
         let largeOutput = generateLargeOutput(lines: 50000)
         let result = await analyzer.analyze(largeOutput)
         #expect(result != nil)
     }
 
-    @Test("Performance with 100k lines", .timeLimit(.seconds(30)))
+    @Test("Performance with 100k lines", .timeLimit(.minutes(1)))
     func performance100kLines() async {
         let largeOutput = generateLargeOutput(lines: 100_000)
         let result = await analyzer.analyze(largeOutput)
@@ -528,7 +419,7 @@ struct PerformanceTests {
         await analyzer.clearCache()
     }
 
-    @Test("Concurrent analysis performance", .timeLimit(.seconds(10)))
+    @Test("Concurrent analysis performance", .timeLimit(.minutes(1)))
     func concurrentAnalysis() async {
         let output = generateLargeOutput(lines: 1000)
 

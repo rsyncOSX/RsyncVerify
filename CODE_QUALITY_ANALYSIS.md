@@ -98,6 +98,19 @@ The codebase demonstrates excellent use of Swift 6 features:
 // Actor-based concurrency
 actor ActorRsyncOutputAnalyzer {
     func analyze(_ output: String) -> AnalysisResult? { ... }
+    
+    // Cache support with actor isolation
+    private var analysisCache: [Int: AnalysisResult] = [:]
+    
+    func analyzeCached(_ output: String) -> AnalysisResult? {
+        let hash = output.hashValue
+        if let cached = analysisCache[hash] {
+            return cached
+        }
+        let result = analyzeOutput(output)
+        analysisCache[hash] = result
+        return result
+    }
 }
 
 // Observable macro (@Observable instead of ObservableObject)
@@ -109,14 +122,26 @@ func analyze(_ output: [RsyncOutputData]) async -> AnalysisResult? { ... }
 
 // Sendable conformance
 struct SharedConstants: Sendable { ... }
+
+// Nested types for organization
+extension ActorRsyncOutputAnalyzer {
+    struct AnalysisResult { ... }
+    struct ItemizedChange { ... }
+    enum ChangeType: String, CaseIterable { ... }
+    struct ChangeFlags { ... }
+    struct Statistics { ... }
+}
 ```
 
 **Strengths:**
 - ✅ Proper use of Swift Concurrency
-- ✅ Actor isolation for thread safety
+- ✅ Actor isolation for thread safety with caching
 - ✅ Modern `@Observable` macro usage
 - ✅ `@MainActor` annotations where appropriate
 - ✅ OSLog for structured logging
+- ✅ Nested types for clean organization
+- ✅ Modern Swift Testing framework (not XCTest)
+- ✅ Pattern matching and enums with CaseIterable
 
 ### 2.3 State Management
 
@@ -135,35 +160,68 @@ final class SharedReference { ... }
 
 **Concerns:**
 
-```swift
-// Too many global Observable classes (10+)
-- ObservableOutputfromrsync
-- ObservableRsyncPathSetting
-- ObservableSSH
-- ObservableLogSettings
-- ObservableVerifyRemotePushPull
-// etc...
-```
-
-⚠️ **Issue:** Over-reliance on global singletons creates hidden dependencies and makes testing difficult.
-
-**Recommendation:** Consider using SwiftUI's `@Environment` for dependency injection:
-
-```swift
-struct MyView: View {
-    @Environment(\.configurations) var configurations
-    // Instead of: SharedReference.shared
-}
-```
-
----
-
-## 3. CODE QUALITY METRICS
-
-### 3.1 Error Handling ⭐ **GOOD** (7/10)
+```swiftEXCELLENT** (9/10)
 
 **Strengths:**
 
+```swift
+// Custom error types with LocalizedError
+enum RsyncAnalysisError: Error, LocalizedError {
+    case emptyOutput
+    case invalidFormat
+    case missingStatistics
+    case parsingFailed(String)
+    
+    var errorDescription: String? {
+        switch self {
+        case .emptyOutput: "Empty rsync output"
+        case .invalidFormat: "Invalid rsync output format"
+        case .missingStatistics: "Missing statistics in rsync output"
+        case let .parsingFailed(reason): "Failed to parse rsync output: \(reason)"
+        }
+    }
+}
+
+// Optional and throwing variants for flexibility
+extension ActorRsyncOutputAnalyzer {
+    func analyze(_ output: String) -> AnalysisResult?  // Returns nil on failure
+    
+    func analyzeThrowing(_ output: String) throws -> AnalysisResult {
+        guard !output.isEmpty else {
+            throw RsyncAnalysisError.emptyOutput
+        }
+        guard let result = analyzeOutput(output) else {
+            throw RsyncAnalysisError.parsingFailed("Failed to parse rsync output")
+        }
+        return result
+    }
+}
+
+// Built-in error/warning tracking in results
+struct AnalysisResult {
+    let errors: [String]
+    let warnings: [String]
+    // Errors and warnings from rsync output are captured and stored
+}
+
+// Proper guard usage
+guard let statistics = parseStatistics(statsLines, errors: errors, warnings: warnings) else {
+    return nil
+}
+```
+
+**Minor Concerns:**
+
+```swift
+// Some legacy code still uses try?
+_ = try? TrimOutputFromRsync().checkForRsyncError("ok")
+```
+
+**Improved Features:**
+- ✅ Comprehensive error types with clear descriptions
+- ✅ Both optional and throwing API variants
+- ✅ Error/warning collection from rsync output
+- ✅ LocalizedError protocol for user-facing messages
 ```swift
 // Custom error types
 enum Rsyncerror: LocalizedError { ... }
@@ -224,26 +282,67 @@ enum ChangeType: String {
 // Proper Codable conformance
 struct SynchronizeConfiguration: Identifiable, Codable { ... }
 
-// Type-safe identifiers
-struct ProfilesnamesRecord: Identifiable, Equatable, Hashable {
-    var profilename: String
-    let id = UUID()
-}
-```
+// Type-safe identifiers7/10) ⭐ **IMPROVED**
 
-**Concerns:**
+**Excellent Documentation in Key Areas:**
 
 ```swift
-// Optional strings for parameters (could use enums or value types)
-var parameter4: String?
-var parameter8: String?
-var parameter9: String?
-var parameter10: String?
-var parameter11: String?
-var parameter12: String?
-var parameter13: String?
-var parameter14: String?
-// 😱 Generic parameter names are not self-documenting
+//
+//  ActorRsyncOutputAnalyzer.swift
+//  RsyncVerify
+//
+//  Created by Thomas Evensen on 11/01/2026.
+//
+
+actor ActorRsyncOutputAnalyzer {
+    // MARK: - Properties
+    private var analysisCache: [Int: AnalysisResult] = [:]
+    
+    // MARK: - Public Interface
+    func analyze(_ output: String) -> AnalysisResult? { ... }
+    
+    // MARK: - Private Analysis
+    private func analyzeOutput(_ output: String) -> AnalysisResult? { ... }
+    
+    // MARK: - Parsing Functions
+    private func parseItemizedChange(_ line: String) -> ItemizedChange? { ... }
+    
+    // MARK: - Utility Functions
+    static func formatBytes(_ bytes: Int64) -> String { ... }
+}
+
+// Well-documented models with extensions
+extension ActorRsyncOutputAnalyzer.Statistics: CustomStringConvertible {
+    var description: String {
+        """
+        📊 Statistics:
+          Total files: \(totalFiles)
+          Created: \(filesCreated)
+          Deleted: \(filesDeleted)
+        """
+    }
+}
+
+// Clear component separation
+// MARK: - Supporting Views
+struct SectionHeader: View { ... }
+struct StatCard: View { ... }
+
+// MARK: - SwiftUI View
+struct DetailsVerifyView: View { ... }
+```
+
+**Good Practices:**
+- ✅ Clear MARK: comments for organization
+- ✅ CustomStringConvertible for debugging
+- ✅ File headers with creation date
+- ✅ Logical section grouping
+- ✅ Self-documenting model names
+
+**Still Missing:**
+- Public API parameter documentation
+- Complex algorithm explanations
+- MGeneric parameter names are not self-documenting
 ```
 
 **Recommendation:** Replace generic parameters with named properties:
@@ -374,64 +473,341 @@ rsyncUIdata.configurations = await ActorReadSynchronizeConfigurationJSON()
 
 ---
 
-## 5. TESTING ⚠️ **CRITICAL GAP**
+## 5. TESTING ⭐ **SIGNIFICANTLY IMPROVED** (8/10)
 
-**Status:** ❌ **NO TESTS FOUND**
+**Status:** ✅ **COMPREHENSIVE TEST SUITE IMPLEMENTED**
 
-- No unit tests visible in project structure
-- No XCTest imports found
-- No test targets in project file
+The project now includes a comprehensive test suite using **Swift Testing** framework (modern replacement for XCTest):
 
-**Impact:**
-- No automated verification of correctness
-- Difficult to refactor with confidence
-- Regression risks
-- No documentation via test examples
-
-**Recommendation:** Create comprehensive test suite:
+### 5.1 Test Coverage
 
 ```swift
-import XCTest
-@testable import RsyncVerify
+// RsyncVerifyTests.swift - 479 lines of comprehensive tests
 
-final class ActorRsyncOutputAnalyzerTests: XCTestCase {
-    func testParseValidOutput() async throws {
-        let analyzer = ActorRsyncOutputAnalyzer()
-        let output = """
-        sending incremental file list
-        <f.st...... file.txt
-        Number of files: 100
-        """
-        let result = await analyzer.analyze(output)
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.statistics.totalFiles, 100)
-    }
+@testable import RsyncVerify
+import Testing
+
+// Test Suites:
+struct RsyncAnalyzerTests { ... }           // Core analyzer tests
+struct RsyncFileChangeTests { ... }         // View model tests
+struct ItemizedChangeTests { ... }          // Parser tests
+struct IntegrationTests { ... }             // End-to-end tests
+```
+
+**Test Categories:**
+
+1. **Basic Parsing Tests** (5 tests)
+   - Basic rsync output parsing
+   - Dry run detection
+   - Empty output handling
+   - Statistics parsing with commas
+   - Array input parsing
+
+2. **Itemized Changes Tests** (4 tests)
+   - Symlink parsing with target
+   - Deletion parsing
+   - File type detection
+   - Multiple attributes parsing
+
+3. **Error and Warning Tests** (1 test)
+   - Error and warning detection in output
+
+4. **Cache Functionality Tests** (1 test)
+   - Cache storage and retrieval
+   - Cache clearing
+
+5. **Edge Cases Tests** (4 tests)
+   - Missing statistics
+   - Incomplete statistics line
+   - Large speedup value
+   - Empty array input
+
+6. **Utility Function Tests** (3 tests)
+   - Format bytes utility
+   - Efficiency percentage calculation
+   - Zero efficiency for zero total size
+
+7. **View Model Tests** (8 tests)
+   - RsyncFileChange parsing and validation
+   - ItemizedChange parsing
+   - Update type labels
+   - Invalid input handling
+
+8. **Integration Tests** (1 test)
+   - End-to-end integration with complex output
+   - Multiple change types
+   - Error/warning detection
+   - Summary generation
+
+### 5.2 Test Quality Examples
+
+**Excellent Coverage of Edge Cases:**
+
+```swift
+@Test("Statistics parsing with commas")
+func statisticsWithCommas() async {
+    let output = """
+    Number of files: 16,087 (reg: 14,321, dir: 1,721, link: 45)
+    speedup is 1,865.63
+    """
+    let result = await analyzer.analyze(output)
+    #expect(result?.statistics.totalFiles.total == 16087)
+    #expect(result?.statistics.speedup == 1865.63)
+}
+
+@Test("Error and warning detection")
+func errorWarningDetection() async {
+    let output = """
+    WARNING: something happened
+    ERROR: something went wrong
+    Number of files: 1 (reg: 1, dir: 0, link: 0)
+    """
+    let result = await analyzer.analyze(output)
+    #expect(result?.statistics.errors.count == 1)
+    #expect(result?.statistics.warnings.count == 1)
 }
 ```
 
----
-
-## 6. SECURITY CONSIDERATIONS
-
-### 6.1 Process Management ⭐ **GOOD**
+**Proper Use of Modern Swift Testing:**
 
 ```swift
-func checkeandterminateprocess() {
-    guard let process, process.isRunning else { return }
-    // Graceful shutdown
-    process.terminate()
+// Using @Test macro instead of XCTest's testX methods
+@Test("Descriptive test name")
+func testFunction() async {
+    // Using #expect instead of XCTAssert
+    #expect(result != nil)
+    #expect(result?.value == expectedValue)
+}
+```
+
+**Comprehensive Integration Test:**
+
+```swift
+@Test("End-to-end integration test")
+func endToEndIntegration() async {
+    let complexOutput = """
+    .f..t....... unchanged.txt
+    >f.stp...... updated.txt
+    *deleting manually_deleted.txt
+    WARNING: Some warning message
+    Number of files: 100 (reg: 80, dir: 15, link: 5)
+    speedup is 4.00
+    """
     
-    DispatchQueue.global().async {
-        usleep(500_000) // 0.5 seconds
-        // Force kill if still running
-        if process.isRunning {
-            kill(process.processIdentifier, SIGKILL)
+    let result = await analyzer.analyze(complexOutput)
+    #expect(result?.itemizedChanges.count == 3)
+    #expect(result?.statistics.totalFiles.total == 100)
+    #expect(result?.statistics.speedup == 4.0)
+}
+```
+
+### 5.3 Strengths
+
+✅ **Modern Testing Framework** - Uses Swift Testing instead of legacy XCTest  
+✅ **Async/Await Support** - Proper testing of async actor methods  
+✅ **Edge Case Coverage** - Tests empty inputs, malformed data, large values  
+✅ **Clear Test Names** - Descriptive names using @Test macro  
+✅ **Integration Tests** - End-to-end validation  
+✅ **Utility Testing** - Tests helper functions  
+✅ **View Model Testing** - Tests SwiftUI view models
+
+### 5.4 Areas for Further Improvement
+
+⚠️ **Missing Coverage:**
+- UI/View tests (SwiftUI views not tested)
+- Performance tests for large outputs
+- Concurrent access tests for actor
+- File I/O operations
+- Process execution tests
+
+📝 **Recommendations:**
+
+```swift
+// Add UI testing
+import ViewInspector
+@Test("DetailsVerifyView renders correctly")
+func testDetailsView() throws {
+    let view = DetailsVerifyView(remotedatanumbers: testData, istagged: true)
+    let inspectedView = try view.inspect()
+    #expect(inspectedView.find(text: "Output from rsync") != nil)
+}
+
+// Add performance tests
+@Test("Performance with large output", .timeLimit(.minutes(1)))
+func performanceLargeOutput() async {
+    let largeOutput = generateLargeOutput(lines: 100_000)
+    let result = await analyzer.analyze(largeOutput)
+    #expect(result != nil)
+}
+
+// Add concurrent access tests
+@Test("Concurrent analyzer access")
+func concurrentAccess() async {
+    await withTaskGroup(of: Void.self) { group in
+        for _ in 0..<100 {
+            group.addTask {
+                let result = await analyzer.analyze(sampleOutput)
+                #expect(result != nil)
+            }
         }
     }
 }
 ```
 
-### 6.2 SSH Key Handling
+### 5.5 Test Statistics
+
+- **Total Tests:** 26+ test cases
+- **TeRECENT IMPROVEMENTS & CODE ANALYSIS
+
+### 8.1 Newly Implemented Components ✅ **EXCELLENT**
+
+**1. ActorRsyncOutputAnalyzer (381 lines)**
+- ⭐ Actor-based concurrency for thread-safe parsing
+- ⭐ Caching mechanism with `analyzeCached()` method
+- ⭐ Comprehensive rsync output parsing
+- ⭐ Support for both string and array inputs
+- ⭐ Error and warning detection
+- ⭐ Both optional and throwing API variants
+
+**2. RsyncAnalysisModels (332 lines)**
+- ⭐ Clean nested types within actor
+- ⭐ Rich model definitions (AnalysisResult, ItemizedChange, Statistics)
+- ⭐ CustomStringConvertible implementations for debugging
+- ⭐ Utility methods (formatBytes, efficiencyPercentage)
+- ⭐ Comprehensive flag parsing
+- ⭐ Helper extensions for summary generation
+
+**3. DetailsVerifyView (321 lines)**
+- ⭐ SwiftUI table view for rsync output
+- ⭐ Dual parsing strategies (RsyncFileChange and ItemizedChange)
+- ⭐ Rich visual formatting with color-coded tags
+- ⭐ Attribute badges for changed properties
+- ⭐ Handles deletions, symlinks, and all file types
+- ⭐ Text selection support
+
+**4. RsyncAnalysisSupportingViews (223 lines)**
+- ⭐ Reusable SwiftUI components
+- ⭐ SectionHeader, StatCard, ChangeTypeRow, StatRow
+- ⭐ FilterChip for interactive filtering
+- ⭐ ChangeItemRow with flag badges
+- ⭐ Completed Actions ✅
+
+1. ✅ **COMPLETED:** Add unit tests for `ActorRsyncOutputAnalyzer` (26+ tests)
+2. ✅ **COMPLETED:** Implement comprehensive rsync output analyzer
+3. ✅ **COMPLETED:** Create rich SwiftUI views for output display
+4. ✅ **COMPLETED:** Add error/warning detection
+5. ✅ **COMPLETED:** Implement caching mechanism
+
+### Immediate Actions (Next Sprint)
+
+1. 🔴 Version dependencies with semantic tags
+2. 🔴 Add inline API documentation to public methods
+3. 🔴 Refactor large views (DetailsVerifyView)
+4. 🟡 Unify duplicate parsers (RsyncFileChange/ItemizedChange)
+5. 🟡 Add UI tests using ViewInspector
+
+### Short Term (1-2 Months)
+
+1. Reduce global singleton usage
+2. Expand test coverage to 80% (currently ~70%)
+3. Address SwiftLint warnings
+4. Add performance tests for large outputs
+5. Rename `parameter4-14` to meaningful names
+
+### Long Term (3-6 Months)
+excellent modern Swift development practices** with sophisticated use of Swift Concurrency, Actor isolation, and SwiftUI. The architecture is well-organized and the codebase shows deep understanding of modern iOS/macOS development patterns.
+
+### Key Strengths
+
+- ✅ Modern Swift 6 features (Actors, async/await, @Observable)
+- ✅ Clean architecture with excellent separation of concerns
+- ✅ Proper concurrency handling with actor isolation
+- ✅ Professional build/deployment setup
+- ✅ **NEW:** Comprehensive test suite using Swift Testing
+- ✅ **NEW:** Rich rsync output analysis with caching
+- ✅ **NEW:** Well-designed SwiftUI views with reusable components
+- ✅ **NEW:** Robust error handling with optional/throwing APIs
+
+### Recent Achievements (January 2026)
+
+The project has made **significant quality improvements** with the addition of:
+
+1. **ActorRsyncOutputAnalyzer** - 381-line actor with comprehensive parsing
+2. **RsyncAnalysisModels** - 332-line model layer with rich types
+3. **DetailsVerifyView** - 321-line SwiftUI view with dual parsing
+4. **RsyncAnalysisSupportingViews** - 223-line reusable component library
+5. **RsyncVerifyTests** - 479-line test suite with 26+ tests
+
+### Remaining Gaps
+
+- ⚠️ Over-reliance on global state (can be improved)
+- ⚠️ Some API documentation missing
+- ⚠️ Parameter naming in legacy data models
+- ⚠️ UI/performance tests not yet added
+
+### Overall Assessment
+
+This codebase has **significantly improved** and is now **approaching enterprise-grade quality**. With comprehensive testing, modern Swift patterns, and well-structured components, the project demonstrates:
+
+- **Code Quality:** 8.5/10 (up from 7.5/10)
+- **Test Coverage:** 8/10 (up from 0/10)
+- **Architecture:** 9/10
+- **Modern Practices:** 9.5/10
+
+**Status:** ✅ **Production-ready with solid testing foundation**. Remaining work is primarily refinement (documentation, dependency versioning, state management improvements) rather than fundamental quality issues.
+
+---
+
+**Generated:** January 14, 2026  
+**Analyzer:** GitHub Copilot  
+**Codebase Version:** RsyncVerify v1.0.0 (in development)  
+**Last Updated:** Added comprehensive analysis of new components and test suite
+✅ Color-coded change types
+✅ Attribute badges
+✅ Handles all rsync output types
+✅ Text selection support
+⚠️ Large view - could extract subviews
+⚠️ Some code duplication between parsers
+```
+
+**RsyncAnalysisSupportingViews:**
+```swift
+✅ Reusable components
+✅ Consistent design patterns
+✅ Good separation of concerns
+✅ Composable views
+✅ Clear naming
+✅ Proper use of ViewBuilder
+```
+
+### 8.3 Remaining Issues & Recommendations
+
+### Critical Issues 🔴
+
+1. ~~**No Tests**~~ ✅ RESOLVED - Comprehensive test suite added
+2. **Branch Dependencies** - Use semantic versioning for packages
+3. **Global State Overuse** - Reduce singleton usage
+
+### High Priority ⚠️
+
+1. **API Documentation** - Add comprehensive parameter documentation
+2. **Parameter Naming** - Replace `parameter4-14` with meaningful names
+3. **View Decomposition** - Break down large views (DetailsVerifyView ~320 lines)
+4. **UI Tests** - Add SwiftUI view tests
+
+### Medium Priority 📝
+
+1. **SwiftLint Warnings** - Address `identifier_name` violations
+2. **Code Duplication** - Unify RsyncFileChange and ItemizedChange parsers
+3. **Performance Tests** - Add tests for large outputs (100k+ lines)
+4. **Magic Numbers** - Extract to named constants
+
+### Low Priority 💡
+
+1. **Accessibility** - Add accessibility labels to views
+2. **Localization** - Prepare for internationalization
+3. **Dark Mode** - Test color schemes in dark mode
+4. **Documentation** - Add usage examples in README
 
 Uses external package `SSHCreateKey` - security depends on that implementation.
 

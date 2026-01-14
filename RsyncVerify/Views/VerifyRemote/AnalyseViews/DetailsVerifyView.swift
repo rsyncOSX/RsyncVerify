@@ -1,3 +1,12 @@
+//
+//  RsyncFileChange.swift
+//  RsyncVerify
+//
+//  Created by Thomas Evensen on 11/01/2026.
+//
+
+import SwiftUI
+
 struct RsyncFileChange {
     let rawPrefix: String
     let path: String
@@ -149,7 +158,33 @@ struct ItemizedChange {
     }
 }
 
+// MARK: - Color Definitions for non-SwiftUI contexts
+
+#if canImport(SwiftUI)
+import SwiftUI
+#else
+struct Color {
+    static let orange = Color()
+    static let red = Color()
+    static let green = Color()
+    static let blue = Color()
+    static let purple = Color()
+    static let indigo = Color()
+    static let gray = Color()
+    static let primary = Color()
+    static let secondary = Color()
+    
+    private init() {}
+}
+#endif
 // MARK: - SwiftUI View
+
+//
+//  DetailsVerifyView.swift
+//  RsyncVerify
+//
+//  Created by Thomas Evensen on 11/01/2026.
+//
 
 import SwiftUI
 
@@ -174,6 +209,9 @@ struct DetailsVerifyView: View {
                     }
                 }
             }
+        } else {
+            Text("No rsync output available")
+                .foregroundColor(.secondary)
         }
     }
     

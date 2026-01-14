@@ -1,13 +1,9 @@
 //
-//  RsyncAnalysisModels.swift
+//  ActorRsyncOutputAnalyzer+Models.swift
 //  RsyncVerify
 //
-//  Created by Thomas Evensen on 13/01/2026.
+//  Created by Thomas Evensen on 11/01/2026.
 //
-
-import Foundation
-
-// MARK: - Rsync Analysis Data Models
 
 extension ActorRsyncOutputAnalyzer {
     struct AnalysisResult {
@@ -91,7 +87,7 @@ extension ActorRsyncOutputAnalyzer {
         let xattr: Bool // x
         let isDeletion: Bool
         
-        init(from flagString: String = "") {
+        init(from flagString: String) {
             // Format: . L...p...... or *deleting
             if flagString.hasPrefix("*deleting") {
                 self.fileType = ""
@@ -132,11 +128,7 @@ extension ActorRsyncOutputAnalyzer {
             self.isDeletion = isDeletion
         }
         
-        static let none = ChangeFlags(isDeletion: false)
-        
-        init() {
-            self.init(isDeletion: false)
-        }
+        static let none = ChangeFlags(from: "")
         
         var description: String {
             var flags: [String] = []

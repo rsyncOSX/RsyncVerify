@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import RsyncProcessStreaming
 
 actor ActorRsyncOutputAnalyzer {
     // MARK: - Properties
@@ -49,8 +48,10 @@ actor ActorRsyncOutputAnalyzer {
         var errors: [String] = []
         var warnings: [String] = []
         
-        for rawLine in output.split(whereSeparator: { $0.isNewline }) {
-            let line = String(rawLine)
+        // Alternative: Use components(separatedBy:)
+        let lines = output.components(separatedBy: .newlines)
+        
+        for line in lines {
             if line.hasPrefix("Number of files:") {
                 parsingStats = true
             }
@@ -66,7 +67,7 @@ actor ActorRsyncOutputAnalyzer {
                 }
                 
                 // Parse itemized changes
-                if let change = self.parseItemizedChange(line) {
+                if let change = parseItemizedChange(line) {
                     itemizedChanges.append(change)
                 }
             }
@@ -341,145 +342,7 @@ actor ActorRsyncOutputAnalyzer {
     }
 }
 
-// MARK: - Data Models (Add these if not already defined)
-
-struct AnalysisResult {
-    let itemizedChanges: [ItemizedChange]
-    let statistics: Statistics
-    let isDryRun: Bool
-    let errors: [String]
-    let warnings: [String]
-}
-
-
-enum ChangeType {
-    case symlink
-    case directory
-    case file
-    case device
-    case special
-    case deletion
-    case unknown
-}
-
-struct ChangeFlags {
-    let from: String
-    let isDeletion: Bool
-    
-    init(from: String = "", isDeletion: Bool = false) {
-        self.from = from
-        self.isDeletion = isDeletion
-    }
-}
-
-struct FileCount {
-    let total: Int
-    let regular: Int
-    let directories: Int
-    let links: Int
-}
-
-struct Statistics {
-    let totalFiles: FileCount
-    let filesCreated: FileCount
-    let filesDeleted: Int
-    let regularFilesTransferred: Int
-    let totalFileSize: Int64
-    let totalTransferredSize: Int64
-    let literalData: Int64
-    let matchedData: Int64
-    let bytesSent: Int64
-    let bytesReceived: Int64
-    let speedup: Double
-    let errors: [String]
-    let warnings: [String]
-}
-
-
-// MARK: - Pretty Printing Extensions
-
-extension ActorRsyncOutputAnalyzer.AnalysisResult: CustomStringConvertible {
-    var description: String {
-        var result = "=== Rsync Analysis ===\n"
-        result += isDryRun ? "🔍 DRY RUN (no changes made)\n\n" : "✅ LIVE RUN\n\n"
-        
-        result += "📊 Statistics:\n"
-        result += "  Total files: \(statistics.totalFiles.total)\n"
-        result += "    - Regular:  \(statistics.totalFiles.regular)\n"
-        result += "    - Directories: \(statistics.totalFiles.directories)\n"
-        result += "    - Links: \(statistics.totalFiles.links)\n"
-        result += "  Files created: \(statistics.filesCreated.total)\n"
-        result += "  Files deleted: \(statistics.filesDeleted)\n"
-        result += "  Files transferred: \(statistics.regularFilesTransferred)\n\n"
-        
-        result += "💾 Data Transfer:\n"
-        result += "  Total size: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.totalFileSize))\n"
-        result += "  To transfer: \(ActorRsyncOutputAnalyzer.formatBytes(statistics.totalTransferredSize))\n"
-        let efficiency = ActorRsyncOutputAnalyzer.efficiencyPercentage(statistics: statistics)
-        result += "  Efficiency: \(String(format: "%.2f", efficiency))% needs transfer\n"
-        result += "  Speedup: \(String(format: "%.2f", statistics.speedup))x\n\n"
-        
-        result += "🔄 Changes (\(itemizedChanges.count) items):\n"
-        
-        let deletions = itemizedChanges.filter { $0.changeType == .deletion }
-        let symlinks = itemizedChanges.filter { $0.changeType == .symlink }
-        let directories = itemizedChanges.filter { $0.changeType == .directory }
-        let files = itemizedChanges.filter { $0.changeType == .file }
-        let others = itemizedChanges.filter { $0.changeType == .unknown || $0.changeType == .device || $0.changeType == .special }
-        
-        if !deletions.isEmpty {
-            result += "  Deletions: \(deletions.count)\n"
-        }
-        if !symlinks.isEmpty {
-            result += "  Symlinks: \(symlinks.count)\n"
-        }
-        if !directories.isEmpty {
-            result += "  Directories: \(directories.count)\n"
-        }
-        if !files.isEmpty {
-            result += "  Files: \(files.count)\n"
-        }
-        if !others.isEmpty {
-            result += "  Other items: \(others.count)\n"
-        }
-        
-        // Add errors and warnings
-        if !statistics.errors.isEmpty {
-            result += "\n❌ Errors (\(statistics.errors.count)):\n"
-            for error in statistics.errors {
-                result += "  - \(error)\n"
-            }
-        }
-        
-        if !statistics.warnings.isEmpty {
-            result += "\n⚠️ Warnings (\(statistics.warnings.count)):\n"
-            for warning in statistics.warnings {
-                result += "  - \(warning)\n"
-            }
-        }
-        
-        return result
-    }
-    
-    var detailedDescription: String {
-        var result = description
-        
-        // Add detailed change list
-        if !itemizedChanges.isEmpty {
-            result += "\n📋 Detailed Changes:\n"
-            for change in itemizedChanges.prefix(50) { // Limit to first 50
-                result += "  \(change)\n"
-            }
-            if itemizedChanges.count > 50 {
-                result += "  ... and \(itemizedChanges.count - 50) more\n"
-            }
-        }
-        
-        return result
-    }
-}
-
-// MARK: - Error Handling (Optional)
+// MARK: - Error Handling
 
 enum RsyncAnalysisError: Error, LocalizedError {
     case emptyOutput
@@ -501,7 +364,7 @@ enum RsyncAnalysisError: Error, LocalizedError {
     }
 }
 
-// Optional extension for throwing version
+// Optional throwing version
 extension ActorRsyncOutputAnalyzer {
     func analyzeThrowing(_ output: String) throws -> AnalysisResult {
         guard !output.isEmpty else {
@@ -515,4 +378,3 @@ extension ActorRsyncOutputAnalyzer {
         return result
     }
 }
-

@@ -8,6 +8,7 @@
 @testable import RsyncVerify
 import Testing
 import Foundation
+import RsyncAnalyse
 
 struct RsyncAnalyzerTests {
     private let analyzer = ActorRsyncOutputAnalyser()
@@ -231,16 +232,11 @@ struct RsyncAnalyzerTests {
             RsyncOutputData(record: "Total file size: 1024 bytes")
         ]
 
-        let result = await analyzer.analyze(data)
+        let stringData = data.map(\.record).joined(separator: "\n")
+        let result = await analyzer.analyze(stringData)
         #expect(result != nil)
         #expect(result?.itemizedChanges.count == 2)
         #expect(result?.statistics.totalFiles.total == 2)
-    }
-
-    @Test("Empty array input")
-    func emptyArrayInput() async {
-        let result = await analyzer.analyze([])
-        #expect(result == nil)
     }
 
     // MARK: - Utility Function Tests

@@ -19,7 +19,7 @@ struct RsyncVerifyView: View {
     var body: some View {
         VStack {
             VerifyRemoteMainView(rsyncUIdata: rsyncUIdata,
-                             selectedprofileID: $selectedprofileID)
+                                 selectedprofileID: $selectedprofileID)
         }
         .padding()
         .task {

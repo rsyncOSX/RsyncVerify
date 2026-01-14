@@ -17,11 +17,10 @@ struct VerifyInspectorView: View {
 
     var body: some View {
         VStack(alignment: .center) {
-            
             Toggle("Tag output", isOn: $istagged)
                 .toggleStyle(.switch)
                 .padding(10)
-            
+
             Toggle("Push only", isOn: $pushonly)
                 .toggleStyle(.switch)
                 .padding(10)
@@ -29,17 +28,15 @@ struct VerifyInspectorView: View {
             Toggle("Pull only", isOn: $pullonly)
                 .toggleStyle(.switch)
                 .padding(10)
-            
+
             Toggle("Keep delete", isOn: $keepdelete)
                 .toggleStyle(.switch)
                 .padding(10)
-        
-            }
-            .padding()
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-            )
         }
-        
+        .padding()
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
+    }
 }

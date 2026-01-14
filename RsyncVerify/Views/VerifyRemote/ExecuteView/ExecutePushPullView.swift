@@ -9,7 +9,7 @@ struct ExecutePushPullView: View {
     @State private var showprogressview = false
     @State private var remotedatanumbers: RemoteDataNumbers?
     @State private var dryrun: Bool = true
-    
+
     @State private var progress: Double = 0
     @State private var max: Double = 0
 

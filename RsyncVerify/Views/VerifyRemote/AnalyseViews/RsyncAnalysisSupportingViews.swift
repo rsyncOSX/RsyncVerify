@@ -188,7 +188,7 @@ struct ChangeItemRow: View {
         case .device: "💿"
         case .special: "⚙️"
         case .unknown: "❓"
-        case . deletion: "🗑️"
+        case .deletion: "🗑️"
         }
     }
 

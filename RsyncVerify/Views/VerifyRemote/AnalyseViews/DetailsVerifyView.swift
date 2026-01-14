@@ -1,5 +1,5 @@
 //
-//  RsyncFileChange.swift
+//  DetailsVerifyView.swift
 //  RsyncVerify
 //
 //  Created by Thomas Evensen on 11/01/2026.
@@ -20,7 +20,7 @@ struct RsyncFileChange {
         // Position 1: file type (f d L D S)
         // Position 2-11: attribute codes
         guard record.count >= 13 else { return nil }
-        
+
         let chars = Array(record)
         guard chars.count >= 12, chars[12] == " " else { return nil }
 
@@ -55,26 +55,26 @@ struct RsyncFileChange {
 
     var fileTypeLabel: String {
         switch fileType {
-        case "f": return "file"
-        case "d": return "dir"
-        case "L": return "link"
-        case "D": return "device"
-        case "S": return "special"
-        default: return String(fileType)
+        case "f": "file"
+        case "d": "dir"
+        case "L": "link"
+        case "D": "device"
+        case "S": "special"
+        default: String(fileType)
         }
     }
 
     var updateTypeLabel: (String, Color) {
         switch updateType {
-        case ".": return ("NONE", .gray)
-        case "*": return ("UPDATED", .orange)
-        case "+": return ("CREATED", .green)
-        case "-": return ("DELETED", .red)
-        case ">": return ("RECEIVED", .blue)
-        case "<": return ("SENT", .purple)
-        case "h": return ("HARDLINK", .indigo)
-        case "?": return ("ERROR", .red)
-        default: return (String(updateType), .primary)
+        case ".": ("NONE", .gray)
+        case "*": ("UPDATED", .orange)
+        case "+": ("CREATED", .green)
+        case "-": ("DELETED", .red)
+        case ">": ("RECEIVED", .blue)
+        case "<": ("SENT", .purple)
+        case "h": ("HARDLINK", .indigo)
+        case "?": ("ERROR", .red)
+        default: (String(updateType), .primary)
         }
     }
 }
@@ -92,22 +92,22 @@ struct ItemizedChange {
     let updateType: Character
     let fileType: Character
     let changedAttributes: [String]
-    
+
     init?(from record: String) {
         let components = record.components(separatedBy: .whitespaces)
             .filter { !$0.isEmpty }
-        
+
         guard components.count >= 2 else { return nil }
-        
+
         let flagString = components[0]
         let flagChars = Array(flagString)
-        
+
         guard flagChars.count >= 2 else { return nil }
-        
-        self.updateType = flagChars[0]
-        self.fileType = flagChars[1]
-        self.path = components.dropFirst().joined(separator: " ")
-        
+
+        updateType = flagChars[0]
+        fileType = flagChars[1]
+        path = components.dropFirst().joined(separator: " ")
+
         // Parse changed attributes from flag string positions 2+
         var attributes: [String] = []
         if flagChars.count > 2 {
@@ -121,39 +121,39 @@ struct ItemizedChange {
                 "a": "acl",
                 "x": "xattr"
             ]
-            
+
             for char in flagChars.dropFirst(2) {
                 if let attributeName = attributeMapping[char] {
                     attributes.append(attributeName)
                 }
             }
         }
-        
-        self.changedAttributes = attributes
+
+        changedAttributes = attributes
     }
-    
+
     var updateDescription: (String, Color) {
         switch updateType {
-        case ".": return ("UNCHANGED", .gray)
-        case "*": return ("UPDATED", .orange)
-        case "+": return ("CREATED", .green)
-        case "-": return ("DELETED", .red)
-        case ">": return ("TRANSFERRED", .blue)
-        case "<": return ("SENT", .purple)
-        case "h": return ("HARDLINK", .indigo)
-        case "?": return ("ERROR", .red)
-        default: return (String(updateType), .primary)
+        case ".": ("UNCHANGED", .gray)
+        case "*": ("UPDATED", .orange)
+        case "+": ("CREATED", .green)
+        case "-": ("DELETED", .red)
+        case ">": ("TRANSFERRED", .blue)
+        case "<": ("SENT", .purple)
+        case "h": ("HARDLINK", .indigo)
+        case "?": ("ERROR", .red)
+        default: (String(updateType), .primary)
         }
     }
-    
+
     var fileTypeDescription: String {
         switch fileType {
-        case "f": return "file"
-        case "d": return "dir"
-        case "L": return "link"
-        case "D": return "device"
-        case "S": return "special"
-        default: return String(fileType)
+        case "f": "file"
+        case "d": "dir"
+        case "L": "link"
+        case "D": "device"
+        case "S": "special"
+        default: String(fileType)
         }
     }
 }
@@ -161,22 +161,23 @@ struct ItemizedChange {
 // MARK: - Color Definitions for non-SwiftUI contexts
 
 #if canImport(SwiftUI)
-import SwiftUI
+    import SwiftUI
 #else
-struct Color {
-    static let orange = Color()
-    static let red = Color()
-    static let green = Color()
-    static let blue = Color()
-    static let purple = Color()
-    static let indigo = Color()
-    static let gray = Color()
-    static let primary = Color()
-    static let secondary = Color()
-    
-    private init() {}
-}
+    struct Color {
+        static let orange = Color()
+        static let red = Color()
+        static let green = Color()
+        static let blue = Color()
+        static let purple = Color()
+        static let indigo = Color()
+        static let gray = Color()
+        static let primary = Color()
+        static let secondary = Color()
+
+        private init() {}
+    }
 #endif
+
 // MARK: - SwiftUI View
 
 //
@@ -186,12 +187,10 @@ struct Color {
 //  Created by Thomas Evensen on 11/01/2026.
 //
 
-import SwiftUI
-
 struct DetailsVerifyView: View {
     let remotedatanumbers: RemoteDataNumbers
     let istagged: Bool
-    
+
     var body: some View {
         if let records = remotedatanumbers.outputfromrsync {
             if istagged {
@@ -214,7 +213,7 @@ struct DetailsVerifyView: View {
                 .foregroundColor(.secondary)
         }
     }
-    
+
     @ViewBuilder
     private func parseRecordRow(_ record: String) -> some View {
         if record.contains("*deleting") {

@@ -1,5 +1,5 @@
 //
-//  ActorRsyncOutputAnalyzer+Models.swift
+//  RsyncAnalysisModels.swift
 //  RsyncVerify
 //
 //  Created by Thomas Evensen on 11/01/2026.
@@ -12,7 +12,7 @@ extension ActorRsyncOutputAnalyzer {
         let isDryRun: Bool
         let errors: [String]
         let warnings: [String]
-        
+
         init(itemizedChanges: [ItemizedChange],
              statistics: Statistics,
              isDryRun: Bool,
@@ -31,7 +31,7 @@ extension ActorRsyncOutputAnalyzer {
         let path: String
         let target: String? // For symlinks
         let flags: ChangeFlags
-        
+
         init(changeType: ChangeType,
              path: String,
              target: String? = nil,
@@ -51,19 +51,19 @@ extension ActorRsyncOutputAnalyzer {
         case special = "S"
         case deletion = "*deleting"
         case unknown = "?"
-        
+
         var description: String {
             switch self {
-            case .symlink: return "Symlink"
-            case .directory: return "Directory"
-            case .file: return "File"
-            case .device: return "Device"
-            case .special: return "Special"
-            case .deletion: return "Deletion"
-            case .unknown: return "Unknown"
+            case .symlink: "Symlink"
+            case .directory: "Directory"
+            case .file: "File"
+            case .device: "Device"
+            case .special: "Special"
+            case .deletion: "Deletion"
+            case .unknown: "Unknown"
             }
         }
-        
+
         static func fromFlag(_ flag: String) -> ChangeType {
             if flag.contains("L") { return .symlink }
             if flag.contains("d") { return .directory }
@@ -86,50 +86,50 @@ extension ActorRsyncOutputAnalyzer {
         let acl: Bool // a
         let xattr: Bool // x
         let isDeletion: Bool
-        
+
         init(from flagString: String) {
             // Format: . L...p...... or *deleting
             if flagString.hasPrefix("*deleting") {
-                self.fileType = ""
-                self.checksum = false
-                self.size = false
-                self.timestamp = false
-                self.permissions = false
-                self.owner = false
-                self.group = false
-                self.acl = false
-                self.xattr = false
-                self.isDeletion = true
+                fileType = ""
+                checksum = false
+                size = false
+                timestamp = false
+                permissions = false
+                owner = false
+                group = false
+                acl = false
+                xattr = false
+                isDeletion = true
             } else {
                 let cleanFlag = flagString.trimmingCharacters(in: .whitespaces)
-                self.fileType = cleanFlag.count >= 2 ? String(cleanFlag.prefix(2)) : ""
-                self.checksum = cleanFlag.contains("c")
-                self.size = cleanFlag.contains("s")
-                self.timestamp = cleanFlag.contains("t")
-                self.permissions = cleanFlag.contains("p")
-                self.owner = cleanFlag.contains("o")
-                self.group = cleanFlag.contains("g")
-                self.acl = cleanFlag.contains("a")
-                self.xattr = cleanFlag.contains("x")
-                self.isDeletion = false
+                fileType = cleanFlag.count >= 2 ? String(cleanFlag.prefix(2)) : ""
+                checksum = cleanFlag.contains("c")
+                size = cleanFlag.contains("s")
+                timestamp = cleanFlag.contains("t")
+                permissions = cleanFlag.contains("p")
+                owner = cleanFlag.contains("o")
+                group = cleanFlag.contains("g")
+                acl = cleanFlag.contains("a")
+                xattr = cleanFlag.contains("x")
+                isDeletion = false
             }
         }
-        
+
         init(isDeletion: Bool = false) {
-            self.fileType = ""
-            self.checksum = false
-            self.size = false
-            self.timestamp = false
-            self.permissions = false
-            self.owner = false
-            self.group = false
-            self.acl = false
-            self.xattr = false
+            fileType = ""
+            checksum = false
+            size = false
+            timestamp = false
+            permissions = false
+            owner = false
+            group = false
+            acl = false
+            xattr = false
             self.isDeletion = isDeletion
         }
-        
+
         static let none = ChangeFlags(from: "")
-        
+
         var description: String {
             var flags: [String] = []
             if checksum { flags.append("checksum") }
@@ -159,7 +159,7 @@ extension ActorRsyncOutputAnalyzer {
         let speedup: Double
         let errors: [String]
         let warnings: [String]
-        
+
         init(totalFiles: FileCount,
              filesCreated: FileCount,
              filesDeleted: Int,
@@ -187,11 +187,11 @@ extension ActorRsyncOutputAnalyzer {
             self.errors = errors
             self.warnings = warnings
         }
-        
+
         var totalFilesChanged: Int {
-            return filesCreated.total + filesDeleted
+            filesCreated.total + filesDeleted
         }
-        
+
         var efficiencyPercentage: Double {
             guard totalFileSize > 0 else { return 0 }
             return (Double(totalTransferredSize) / Double(totalFileSize)) * 100.0
@@ -203,20 +203,20 @@ extension ActorRsyncOutputAnalyzer {
         let regular: Int
         let directories: Int
         let links: Int
-        
+
         init(total: Int, regular: Int, directories: Int, links: Int) {
             self.total = total
             self.regular = regular
             self.directories = directories
             self.links = links
         }
-        
+
         var description: String {
-            return "\(total) total (reg: \(regular), dir: \(directories), link: \(links))"
+            "\(total) total (reg: \(regular), dir: \(directories), link: \(links))"
         }
-        
+
         static var zero: FileCount {
-            return FileCount(total: 0, regular: 0, directories: 0, links: 0)
+            FileCount(total: 0, regular: 0, directories: 0, links: 0)
         }
     }
 }
@@ -226,10 +226,10 @@ extension ActorRsyncOutputAnalyzer {
 extension ActorRsyncOutputAnalyzer.ItemizedChange: CustomStringConvertible {
     var description: String {
         var result = "\(changeType.description): \(path)"
-        if let target = target {
+        if let target {
             result += " -> \(target)"
         }
-        if !flags.description.isEmpty && flags.description != "none" {
+        if !flags.description.isEmpty, flags.description != "none" {
             result += " [\(flags.description)]"
         }
         return result
@@ -244,27 +244,27 @@ extension ActorRsyncOutputAnalyzer.Statistics: CustomStringConvertible {
           Created: \(filesCreated)
           Deleted: \(filesDeleted)
           Transferred: \(regularFilesTransferred)
-          
+
         💾 Data Transfer:
           Total size: \(ActorRsyncOutputAnalyzer.formatBytes(totalFileSize))
           Transferred: \(ActorRsyncOutputAnalyzer.formatBytes(totalTransferredSize))
           Efficiency: \(String(format: "%.2f", efficiencyPercentage))%
           Speedup: \(String(format: "%.2f", speedup))x
-          
+
         📊 Transfer Details:
           Literal data: \(ActorRsyncOutputAnalyzer.formatBytes(literalData))
           Matched data: \(ActorRsyncOutputAnalyzer.formatBytes(matchedData))
           Sent: \(ActorRsyncOutputAnalyzer.formatBytes(bytesSent))
           Received: \(ActorRsyncOutputAnalyzer.formatBytes(bytesReceived))
         """
-        
+
         if !errors.isEmpty {
             result += "\n❌ Errors: \(errors.count)"
         }
         if !warnings.isEmpty {
             result += "\n⚠️ Warnings: \(warnings.count)"
         }
-        
+
         return result
     }
 }
@@ -292,16 +292,16 @@ extension ActorRsyncOutputAnalyzer {
         ════════════════════════════
         RSYNC ANALYSIS SUMMARY
         ════════════════════════════
-        
+
         Run Type: \(result.isDryRun ? "DRY RUN (simulation)" : "LIVE RUN")
         """
-        
+
         if result.isDryRun {
             summary += "\n⚠️  No actual changes were made\n"
         }
-        
+
         summary += """
-        
+
         📈 Summary:
           • Total items: \(result.itemizedChanges.count)
           • Files created: \(result.statistics.filesCreated.total)
@@ -309,18 +309,18 @@ extension ActorRsyncOutputAnalyzer {
           • Data efficiency: \(String(format: "%.1f", result.statistics.efficiencyPercentage))%
           • Transfer speedup: \(String(format: "%.1f", result.statistics.speedup))x
         """
-        
+
         if !result.errors.isEmpty {
             summary += "\n\n❌ Found \(result.errors.count) error(s)"
         }
-        
+
         if !result.warnings.isEmpty {
             summary += "\n⚠️  Found \(result.warnings.count) warning(s)"
         }
-        
+
         return summary
     }
-    
+
     func changesByType(for result: AnalysisResult) -> [ChangeType: Int] {
         var counts: [ChangeType: Int] = [:]
         for change in result.itemizedChanges {
@@ -329,4 +329,3 @@ extension ActorRsyncOutputAnalyzer {
         return counts
     }
 }
-

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E911E85E2C6BCD9D00152CD6 /* SSHCreateKey in Frameworks */ = {isa = PBXBuildFile; productRef = E911E85D2C6BCD9D00152CD6 /* SSHCreateKey */; };
+		E921EC202F17CC1700700618 /* RsyncAnalyse in Frameworks */ = {isa = PBXBuildFile; productRef = E921EC1F2F17CC1700700618 /* RsyncAnalyse */; };
 		E93FBF6C2E3DE674005225E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E93FBEBE2E3DE674005225E2 /* Assets.xcassets */; };
 		E952A9A12EB9E139002C11C6 /* ProcessCommand in Frameworks */ = {isa = PBXBuildFile; productRef = E952A9A02EB9E139002C11C6 /* ProcessCommand */; };
 		E95CA3E42C73230800966D69 /* DecodeEncodeGeneric in Frameworks */ = {isa = PBXBuildFile; productRef = E95CA3E32C73230800966D69 /* DecodeEncodeGeneric */; };
@@ -78,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E921EC202F17CC1700700618 /* RsyncAnalyse in Frameworks */,
 				E952A9A12EB9E139002C11C6 /* ProcessCommand in Frameworks */,
 				E9C077762C8CCA65005F8669 /* ParseRsyncOutput in Frameworks */,
 				E9AC986B2ECEF99600D0C654 /* RsyncArguments in Frameworks */,
@@ -172,6 +174,7 @@
 				E9B0B9A12ECCEE68004BDC24 /* RsyncArguments */,
 				E9AC986A2ECEF99600D0C654 /* RsyncArguments */,
 				E97F55DA2EF29BF90053F767 /* RsyncProcessStreaming */,
+				E921EC1F2F17CC1700700618 /* RsyncAnalyse */,
 			);
 			productName = RsyncVerify;
 			productReference = E985C5C325F3AC0700CB895C /* RsyncVerify.app */;
@@ -212,6 +215,7 @@
 				E952A99F2EB9E139002C11C6 /* XCRemoteSwiftPackageReference "ProcessCommand" */,
 				E9AC98692ECEF99600D0C654 /* XCRemoteSwiftPackageReference "RsyncArguments" */,
 				E97F55D92EF29BF90053F767 /* XCRemoteSwiftPackageReference "RsyncProcessStreaming" */,
+				E921EC1E2F17CC1700700618 /* XCRemoteSwiftPackageReference "RsyncAnalyse" */,
 			);
 			productRefGroup = E985C5C425F3AC0700CB895C /* Products */;
 			projectDirPath = "";
@@ -557,6 +561,14 @@
 				kind = branch;
 			};
 		};
+		E921EC1E2F17CC1700700618 /* XCRemoteSwiftPackageReference "RsyncAnalyse" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rsyncOSX/RsyncAnalyse";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		E94B878B2C7321090031B27A /* XCRemoteSwiftPackageReference "DecodeEncodeGeneric" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rsyncOSX/DecodeEncodeGeneric.git";
@@ -604,6 +616,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E911E85C2C6BCD9D00152CD6 /* XCRemoteSwiftPackageReference "SSHCreateKey" */;
 			productName = SSHCreateKey;
+		};
+		E921EC1F2F17CC1700700618 /* RsyncAnalyse */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E921EC1E2F17CC1700700618 /* XCRemoteSwiftPackageReference "RsyncAnalyse" */;
+			productName = RsyncAnalyse;
 		};
 		E952A9A02EB9E139002C11C6 /* ProcessCommand */ = {
 			isa = XCSwiftPackageProductDependency;

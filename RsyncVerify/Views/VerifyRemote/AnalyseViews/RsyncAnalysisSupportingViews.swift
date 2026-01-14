@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import RsyncAnalyse
 
 // MARK: - Supporting Views
 
@@ -114,7 +115,7 @@ struct FilterChip: View {
 }
 
 struct ChangeItemRow: View {
-    let change: ActorRsyncOutputAnalyzer.ItemizedChange
+    let change: ActorRsyncOutputAnalyser.ItemizedChange
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

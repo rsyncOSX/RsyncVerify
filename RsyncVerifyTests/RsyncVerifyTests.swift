@@ -10,7 +10,7 @@ import Testing
 import Foundation
 
 struct RsyncAnalyzerTests {
-    private let analyzer = ActorRsyncOutputAnalyzer()
+    private let analyzer = ActorRsyncOutputAnalyser()
 
     // MARK: - Basic Parsing Tests
 
@@ -248,13 +248,13 @@ struct RsyncAnalyzerTests {
     @Test("Format bytes utility")
     func formatBytesUtility() {
         let bytes: Int64 = 1_048_576 // 1 MB
-        let formatted = ActorRsyncOutputAnalyzer.formatBytes(bytes)
+        let formatted = ActorRsyncOutputAnalyser.formatBytes(bytes)
         #expect(formatted.contains("MB"))
     }
 
     @Test("Efficiency percentage calculation")
     func efficiencyPercentage() {
-        let stats = ActorRsyncOutputAnalyzer.Statistics(
+        let stats = ActorRsyncOutputAnalyser.Statistics(
             totalFiles: .zero,
             filesCreated: .zero,
             filesDeleted: 0,
@@ -270,13 +270,13 @@ struct RsyncAnalyzerTests {
             warnings: []
         )
 
-        let efficiency = ActorRsyncOutputAnalyzer.efficiencyPercentage(statistics: stats)
+        let efficiency = ActorRsyncOutputAnalyser.efficiencyPercentage(statistics: stats)
         #expect(efficiency == 50.0)
     }
 
     @Test("Zero efficiency for zero total size")
     func zeroEfficiency() {
-        let stats = ActorRsyncOutputAnalyzer.Statistics(
+        let stats = ActorRsyncOutputAnalyser.Statistics(
             totalFiles: .zero,
             filesCreated: .zero,
             filesDeleted: 0,
@@ -292,7 +292,7 @@ struct RsyncAnalyzerTests {
             warnings: []
         )
 
-        let efficiency = ActorRsyncOutputAnalyzer.efficiencyPercentage(statistics: stats)
+        let efficiency = ActorRsyncOutputAnalyser.efficiencyPercentage(statistics: stats)
         #expect(efficiency == 0.0)
     }
 }
@@ -302,7 +302,7 @@ struct RsyncAnalyzerTests {
 struct IntegrationTests {
     @Test("End-to-end integration test")
     func endToEndIntegration() async {
-        let analyzer = ActorRsyncOutputAnalyzer()
+        let analyzer = ActorRsyncOutputAnalyser()
 
         let complexOutput = """
         .f..t....... unchanged.txt
@@ -375,7 +375,7 @@ struct IntegrationTests {
 // MARK: - Performance Tests
 
 struct PerformanceTests {
-    private let analyzer = ActorRsyncOutputAnalyzer()
+    private let analyzer = ActorRsyncOutputAnalyser()
 
     @Test("Performance with 10k lines", .timeLimit(.minutes(1)))
     func performance10kLines() async {

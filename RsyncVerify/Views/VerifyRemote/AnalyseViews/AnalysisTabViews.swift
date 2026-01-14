@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import RsyncAnalyse
 
 // MARK: - Overview Tab
 
 struct AnalysisOverviewView: View {
-    let statistics: ActorRsyncOutputAnalyzer.Statistics
-    let itemizedChanges: [ActorRsyncOutputAnalyzer.ItemizedChange]
+    let statistics: ActorRsyncOutputAnalyser.Statistics
+    let itemizedChanges: [ActorRsyncOutputAnalyser.ItemizedChange]
 
     var body: some View {
         ScrollView {
@@ -84,7 +85,7 @@ struct AnalysisOverviewView: View {
                     Text("Total Size:")
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(ActorRsyncOutputAnalyzer.formatBytes(statistics.totalFileSize))
+                    Text(ActorRsyncOutputAnalyser.formatBytes(statistics.totalFileSize))
                         .fontWeight(.medium)
                 }
 
@@ -92,7 +93,7 @@ struct AnalysisOverviewView: View {
                     Text("To Transfer:")
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(ActorRsyncOutputAnalyzer.formatBytes(statistics.totalTransferredSize))
+                    Text(ActorRsyncOutputAnalyser.formatBytes(statistics.totalTransferredSize))
                         .fontWeight(.medium)
                 }
 
@@ -102,7 +103,7 @@ struct AnalysisOverviewView: View {
                     Text("Efficiency:")
                         .foregroundColor(.secondary)
                     Spacer()
-                    let efficiency = ActorRsyncOutputAnalyzer.efficiencyPercentage(statistics: statistics)
+                    let efficiency = ActorRsyncOutputAnalyser.efficiencyPercentage(statistics: statistics)
                     Text(String(format: "%.2f%%", efficiency))
                         .fontWeight(.bold)
                         .foregroundColor(efficiency < 10 ? .green : efficiency < 50 ? .orange : .red)
@@ -127,9 +128,9 @@ struct AnalysisOverviewView: View {
 // MARK: - Changes Tab
 
 struct AnalysisChangesView: View {
-    let changes: [ActorRsyncOutputAnalyzer.ItemizedChange]
+    let changes: [ActorRsyncOutputAnalyser.ItemizedChange]
     @Binding var searchText: String
-    @Binding var selectedChangeTypes: Set<ActorRsyncOutputAnalyzer.ChangeType>
+    @Binding var selectedChangeTypes: Set<ActorRsyncOutputAnalyser.ChangeType>
 
     var body: some View {
         VStack(spacing: 0) {
@@ -179,7 +180,7 @@ struct AnalysisChangesView: View {
         }
     }
 
-    private var filteredChanges: [ActorRsyncOutputAnalyzer.ItemizedChange] {
+    private var filteredChanges: [ActorRsyncOutputAnalyser.ItemizedChange] {
         var filtered = changes
 
         if !searchText.isEmpty {
@@ -193,7 +194,7 @@ struct AnalysisChangesView: View {
         return filtered
     }
 
-    private func toggleFilter(_ type: ActorRsyncOutputAnalyzer.ChangeType) {
+    private func toggleFilter(_ type: ActorRsyncOutputAnalyser.ChangeType) {
         if selectedChangeTypes.contains(type) {
             selectedChangeTypes.remove(type)
         } else {
@@ -205,7 +206,7 @@ struct AnalysisChangesView: View {
 // MARK: - Statistics Tab
 
 struct AnalysisStatisticsView: View {
-    let statistics: ActorRsyncOutputAnalyzer.Statistics
+    let statistics: ActorRsyncOutputAnalyser.Statistics
 
     var body: some View {
         ScrollView {
@@ -248,13 +249,13 @@ struct AnalysisStatisticsView: View {
             SectionHeader(icon: "arrow.up.arrow.down", title: "Transfer Statistics")
 
             VStack(alignment: .leading, spacing: 8) {
-                StatRow(label: "Total File Size", value: ActorRsyncOutputAnalyzer.formatBytes(statistics.totalFileSize))
-                StatRow(label: "Total Transferred", value: ActorRsyncOutputAnalyzer.formatBytes(statistics.totalTransferredSize))
+                StatRow(label: "Total File Size", value: ActorRsyncOutputAnalyser.formatBytes(statistics.totalFileSize))
+                StatRow(label: "Total Transferred", value: ActorRsyncOutputAnalyser.formatBytes(statistics.totalTransferredSize))
 
                 Divider()
 
-                StatRow(label: "Bytes Sent", value: ActorRsyncOutputAnalyzer.formatBytes(statistics.bytesSent))
-                StatRow(label: "Bytes Received", value: ActorRsyncOutputAnalyzer.formatBytes(statistics.bytesReceived))
+                StatRow(label: "Bytes Sent", value: ActorRsyncOutputAnalyser.formatBytes(statistics.bytesSent))
+                StatRow(label: "Bytes Received", value: ActorRsyncOutputAnalyser.formatBytes(statistics.bytesReceived))
 
                 Divider()
 
@@ -268,8 +269,8 @@ struct AnalysisStatisticsView: View {
             SectionHeader(icon: "chart.pie", title: "Data Breakdown")
 
             VStack(alignment: .leading, spacing: 8) {
-                StatRow(label: "Literal Data", value: ActorRsyncOutputAnalyzer.formatBytes(statistics.literalData))
-                StatRow(label: "Matched Data", value: ActorRsyncOutputAnalyzer.formatBytes(statistics.matchedData))
+                StatRow(label: "Literal Data", value: ActorRsyncOutputAnalyser.formatBytes(statistics.literalData))
+                StatRow(label: "Matched Data", value: ActorRsyncOutputAnalyser.formatBytes(statistics.matchedData))
 
                 let total = statistics.literalData + statistics.matchedData
                 if total > 0 {

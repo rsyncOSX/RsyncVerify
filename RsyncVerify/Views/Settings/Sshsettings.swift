@@ -32,9 +32,11 @@ struct Sshsettings: View {
                     setsshpath(path: $sshsettings.sshkeypathandidentityfile,
                                placeholder: "set SSH keypath and identityfile",
                                selectedValue: sshsettings.sshkeypathandidentityfile)
+                    .disabled(true)
                     sshportfield(port: $sshsettings.sshportnumber,
                                  placeholder: "set SSH port",
                                  selectedValue: sshsettings.sshportnumber)
+                    .disabled(true)
                 }
 
             if localsshkeys == false {

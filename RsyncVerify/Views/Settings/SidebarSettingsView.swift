@@ -10,7 +10,7 @@ import Observation
 import SwiftUI
 
 enum SideSettingsbaritems: String, Identifiable, CaseIterable {
-    case rsync_and_path, log, ssh, environment, about
+    case rsync_and_path, log, ssh, about
     var id: String { rawValue }
 }
 
@@ -43,8 +43,6 @@ struct SidebarSettingsView: View {
             Logsettings()
         case .ssh:
             Sshsettings()
-        case .environment:
-            Environmentsettings()
         case .about:
             AboutView()
         }
@@ -67,8 +65,6 @@ struct SidebarSettingsRow: View {
             "network"
         case .ssh:
             "terminal"
-        case .environment:
-            "gear"
         case .about:
             "info.circle.fill"
         }

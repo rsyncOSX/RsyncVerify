@@ -25,56 +25,62 @@ struct Logsettings: View {
                         .onChange(of: logsettings.checkforerrorinrsyncoutput) {
                             SharedReference.shared.checkforerrorinrsyncoutput = logsettings.checkforerrorinrsyncoutput
                         }
+                        .disabled(true)
                     ToggleViewDefault(text: "Add summary logrecord", binding: $logsettings.addsummarylogrecord)
                         .onChange(of: logsettings.addsummarylogrecord) {
                             SharedReference.shared.addsummarylogrecord = logsettings.addsummarylogrecord
                         }
+                        .disabled(true)
                     ToggleViewDefault(text: "No time delay Synchronize URL-actions", binding: $logsettings.synchronizewithouttimedelay)
                         .onChange(of: logsettings.synchronizewithouttimedelay) {
                             SharedReference.shared.synchronizewithouttimedelay = logsettings.synchronizewithouttimedelay
                         }
+                        .disabled(true)
                     ToggleViewDefault(text: "Hide the Sidebar on startup", binding: $logsettings.sidebarishidden)
                         .onChange(of: logsettings.sidebarishidden) {
                             SharedReference.shared.sidebarishidden = logsettings.sidebarishidden
                         }
+                        .disabled(true)
                     ToggleViewDefault(text: "Observe mounting of external drives", binding: $logsettings.observemountedvolumes)
                         .onChange(of: logsettings.observemountedvolumes) {
                             SharedReference.shared.observemountedvolumes = logsettings.observemountedvolumes
                             toggleobservemountedvolumes = logsettings.observemountedvolumes
                         }
+                        .disabled(true)
                     ToggleViewDefault(text: "Always present the summarized estimate view",
                                       binding: $logsettings.alwaysshowestimateddetailsview)
                         .onChange(of: logsettings.alwaysshowestimateddetailsview) {
                             SharedReference.shared.alwaysshowestimateddetailsview = logsettings.alwaysshowestimateddetailsview
                             togglealwaysshowestimateddetailsview = logsettings.alwaysshowestimateddetailsview
                         }
-
+                        .disabled(true)
                     ToggleViewDefault(text: "Use two tables Inspector",
                                       binding: $logsettings.usetwotablesInspector)
                         .onChange(of: logsettings.usetwotablesInspector) {
                             SharedReference.shared.usetwotablesInspector = logsettings.usetwotablesInspector
                             toggleusetwotablesInspector = logsettings.usetwotablesInspector
                         }
-
+                        .disabled(true)
                     ToggleViewDefault(text: "Silence missing stats",
                                       binding: $logsettings.silencemissingstats)
                         .onChange(of: logsettings.silencemissingstats) {
                             SharedReference.shared.silencemissingstats = logsettings.silencemissingstats
                             togglesilencemissingstats = logsettings.silencemissingstats
                         }
-
+                        .disabled(true)
                     ToggleViewDefault(text: "Validate arguments",
                                       binding: $logsettings.validatearguments)
                         .onChange(of: logsettings.validatearguments) {
                             SharedReference.shared.validatearguments = logsettings.validatearguments
                             togglevalidatearguments = logsettings.validatearguments
                         }
-
+                        .disabled(true)
                     if SharedReference.shared.rsyncversion3 {
                         ToggleViewDefault(text: "Confirm execute", binding: $logsettings.confirmexecute)
                             .onChange(of: logsettings.confirmexecute) {
                                 SharedReference.shared.confirmexecute = logsettings.confirmexecute
                             }
+                            .disabled(true)
                     }
                 }
         }

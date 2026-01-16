@@ -25,8 +25,22 @@ struct RsyncVerifyApp: App {
                     NSApplication.shared.terminate(nil)
                 }
         }
+        .commands {
+            SidebarCommands()
+           
+            CommandGroup(replacing: .appInfo) {
+                ConditionalGlassButton(
+                    systemImage: "",
+                    text: "About RsyncVerify",
+                    helpText: "About"
+                ) {
+                    showabout = true
+                }
+            }
+        }
 
         Settings {
+            
             SidebarSettingsView()
         }
     }

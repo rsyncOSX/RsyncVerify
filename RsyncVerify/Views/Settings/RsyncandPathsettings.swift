@@ -31,6 +31,7 @@ struct RsyncandPathsettings: View {
                                 }
                                 Rsyncversion().getRsyncVersion()
                             }
+                            .disabled(true)
 
                         ToggleViewDefault(text: "Apple Silicon",
                                           binding: $rsyncpathsettings.macosarm)
@@ -74,11 +75,13 @@ struct RsyncandPathsettings: View {
                     Rsyncversion().getRsyncVersion()
                 }
             }
+            .disabled(true)
     }
 
     var setrsyncpathdefault: some View {
         EditValueScheme(400, SetandValidatepathforrsync().getpathforrsync(rsyncpathsettings.rsyncversion3),
                         $rsyncpathsettings.localrsyncpath)
+        .disabled(true)
     }
 
     var setpathforrestore: some View {
@@ -101,6 +104,7 @@ struct RsyncandPathsettings: View {
                 }
                 SharedReference.shared.pathforrestore = rsyncpathsettings.temporarypathforrestore
             }
+            .disabled(true)
     }
 
     var setmarkdays: some View {
@@ -114,5 +118,6 @@ struct RsyncandPathsettings: View {
                 }
                 rsyncpathsettings.markdays(days: rsyncpathsettings.marknumberofdayssince)
             }
+            .disabled(true)
     }
 }

@@ -9,6 +9,33 @@
     {
       "layers" : [
         {
+          "fill" : {
+            "solid" : "display-p3:0.11535,0.18199,0.95876,1.00000"
+          },
+          "image-name" : "verify.png",
+          "name" : "verify",
+          "position" : {
+            "scale" : 0.2,
+            "translation-in-points" : [
+              0,
+              -177.9609375
+            ]
+          }
+        }
+      ],
+      "name" : "Group",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
           "image-name" : "cloud 3.png",
           "name" : "cloud 3"
         }

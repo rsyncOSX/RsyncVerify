@@ -27,7 +27,7 @@ struct RsyncVerifyApp: App {
         }
         .commands {
             SidebarCommands()
-           
+
             CommandGroup(replacing: .appInfo) {
                 ConditionalGlassButton(
                     systemImage: "",
@@ -40,7 +40,6 @@ struct RsyncVerifyApp: App {
         }
 
         Settings {
-            
             SidebarSettingsView()
         }
     }

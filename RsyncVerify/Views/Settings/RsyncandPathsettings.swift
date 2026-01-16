@@ -81,7 +81,7 @@ struct RsyncandPathsettings: View {
     var setrsyncpathdefault: some View {
         EditValueScheme(400, SetandValidatepathforrsync().getpathforrsync(rsyncpathsettings.rsyncversion3),
                         $rsyncpathsettings.localrsyncpath)
-        .disabled(true)
+            .disabled(true)
     }
 
     var setpathforrestore: some View {

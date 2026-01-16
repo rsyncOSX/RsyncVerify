@@ -5,8 +5,8 @@
 //  Created by Thomas Evensen on 11/01/2026.
 //
 
-import SwiftUI
 import RsyncAnalyse
+import SwiftUI
 
 // MARK: - SwiftUI View Components
 
@@ -37,4 +37,3 @@ struct DetailsVerifyView: View {
         }
     }
 }
-

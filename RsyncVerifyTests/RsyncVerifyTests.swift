@@ -5,10 +5,10 @@
 //  Created by Thomas Evensen on 11/01/2026.
 //
 
-@testable import RsyncVerify
-import Testing
 import Foundation
 import RsyncAnalyse
+@testable import RsyncVerify
+import Testing
 
 struct RsyncAnalyzerTests {
     private let analyzer = ActorRsyncOutputAnalyser()

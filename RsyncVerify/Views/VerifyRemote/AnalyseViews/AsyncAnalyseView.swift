@@ -5,8 +5,8 @@
 //  Created by GitHub Copilot on 12/01/2026.
 //
 
-import SwiftUI
 import RsyncAnalyse
+import SwiftUI
 
 struct AsyncAnalyseView: View {
     let output: [RsyncOutputData]
@@ -27,4 +27,3 @@ struct AsyncAnalyseView: View {
         }
     }
 }
-

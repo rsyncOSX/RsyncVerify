@@ -5,8 +5,8 @@
 //  Created by Thomas Evensen on 12/01/2026.
 //
 
-import SwiftUI
 import RsyncAnalyse
+import SwiftUI
 
 struct RsyncAnalysisView: View {
     let analysisResult: ActorRsyncOutputAnalyser.AnalysisResult

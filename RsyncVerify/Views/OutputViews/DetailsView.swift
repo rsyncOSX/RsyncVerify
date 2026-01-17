@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import RsyncAnalyse
 
 struct DetailsView: View {
     let remotedatanumbers: RemoteDataNumbers
@@ -56,10 +57,15 @@ struct DetailsView: View {
                 }
             }
 
-            Table(remotedatanumbers.outputfromrsync ?? []) {
-                TableColumn("Output from rsync" + ": \(remotedatanumbers.outputfromrsync?.count ?? 0) rows") { data in
-                    Text(data.record)
+            if let records = remotedatanumbers.outputfromrsync {
+                Table(records) {
+                    TableColumn("Output from rsync (\(records.count) rows)") { data in
+                        RsyncOutputRowView(record: data.record)
+                    }
                 }
+            } else {
+                Text("No rsync output available")
+                    .foregroundColor(.secondary)
             }
         }
     }

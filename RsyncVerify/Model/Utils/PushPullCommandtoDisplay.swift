@@ -6,34 +6,17 @@
 //
 
 import Foundation
-import SSHCreateKey
-
-enum PushPullCommand: String, CaseIterable, Identifiable, CustomStringConvertible {
-    case pullRemote
-    case pushLocal
-
-    var id: String { rawValue }
-
-    var description: String {
-        // Insert space before uppercase letters, then capitalize each word
-        rawValue
-            .replacingOccurrences(of: "([A-Z])", with: " $1", options: .regularExpression)
-            .trimmingCharacters(in: .whitespaces)
-            .capitalized
-    }
-}
 
 @MainActor
 struct PushPullCommandtoDisplay {
     var command: String
 
-    init(display: PushPullCommand,
+    init(push: Bool,
          config: SynchronizeConfiguration,
          dryRun: Bool,
          keepdelete: Bool) {
         var str = ""
-        switch display {
-        case .pullRemote:
+        if push == false {
             if config.offsiteServer.isEmpty == false, config.task == SharedReference.shared.synchronize {
                 if let arguments = ArgumentsPullRemote(config: config).argumentspullremotewithparameters(
                     dryRun: dryRun,
@@ -45,7 +28,7 @@ struct PushPullCommandtoDisplay {
             } else {
                 str = "Use macOS Finder"
             }
-        case .pushLocal:
+        } else {
             if config.offsiteServer.isEmpty == false, config.task == SharedReference.shared.synchronize {
                 if let arguments = ArgumentsSynchronize(config: config).argumentsforpushlocaltoremotewithparameters(
                     dryRun: dryRun,
@@ -58,6 +41,7 @@ struct PushPullCommandtoDisplay {
                 str = "Use macOS Finder"
             }
         }
+
         command = str
     }
 }

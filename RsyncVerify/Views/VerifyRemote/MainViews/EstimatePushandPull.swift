@@ -38,7 +38,6 @@ struct EstimatePushandPull: View {
                                        pullremotedatanumbers: pullremotedatanumbers,
                                        istagged: istagged)
                 }
-
             } else {
                 HStack {
                     ProgressView()

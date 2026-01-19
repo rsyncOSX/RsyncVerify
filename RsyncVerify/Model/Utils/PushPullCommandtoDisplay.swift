@@ -4,7 +4,6 @@
 //
 //  Created by Thomas Evensen on 07/12/2024.
 //
-// swiftlint:disable line_length
 
 import Foundation
 import SSHCreateKey
@@ -56,5 +55,3 @@ struct PushPullCommandtoDisplay {
         command = str
     }
 }
-
-// swiftlint:enable line_length

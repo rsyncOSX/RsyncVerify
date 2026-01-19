@@ -4,7 +4,6 @@
 //
 //  Created by Thomas Evensen on 07/12/2024.
 //
-// swiftlint:disable line_length
 
 import Foundation
 import SSHCreateKey
@@ -36,8 +35,11 @@ struct PushPullCommandtoDisplay {
         switch display {
         case .pullRemote:
             if config.offsiteServer.isEmpty == false, config.task == SharedReference.shared.synchronize {
-                if let arguments = ArgumentsPullRemote(config: config).argumentspullremotewithparameters(dryRun: dryRun,
-                                                                                                         forDisplay: true, keepdelete: keepdelete) {
+                if let arguments = ArgumentsPullRemote(config: config).argumentspullremotewithparameters(
+                    dryRun: dryRun,
+                    forDisplay: true,
+                    keepdelete: keepdelete
+                ) {
                     str = (GetfullpathforRsync().rsyncpath()) + " " + arguments.joined()
                 }
             } else {
@@ -45,8 +47,11 @@ struct PushPullCommandtoDisplay {
             }
         case .pushLocal:
             if config.offsiteServer.isEmpty == false, config.task == SharedReference.shared.synchronize {
-                if let arguments = ArgumentsSynchronize(config: config).argumentsforpushlocaltoremotewithparameters(dryRun: dryRun,
-                                                                                                                    forDisplay: true, keepdelete: keepdelete) {
+                if let arguments = ArgumentsSynchronize(config: config).argumentsforpushlocaltoremotewithparameters(
+                    dryRun: dryRun,
+                    forDisplay: true,
+                    keepdelete: keepdelete
+                ) {
                     str = (GetfullpathforRsync().rsyncpath()) + " " + arguments.joined()
                 }
             } else {
@@ -56,5 +61,3 @@ struct PushPullCommandtoDisplay {
         command = str
     }
 }
-
-// swiftlint:enable line_length

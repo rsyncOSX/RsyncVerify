@@ -11,7 +11,6 @@
 //
 //  Created by Thomas Evensen on 24/06/2024.
 //
-// swiftlint:disable line_length
 
 import Foundation
 import OSLog
@@ -56,7 +55,8 @@ struct Homepath {
             Logger.process.info("Homepath: the following folders were found in \(fullpathmacserial): \(array)")
             return array
         } catch {
-            Logger.process.errorMessageOnly("Homepath: failed to read directory at \(fullpathmacserial): \(error.localizedDescription)")
+            let errorMsg = "Homepath: failed to read directory at \(fullpathmacserial): \(error.localizedDescription)"
+            Logger.process.errorMessageOnly(errorMsg)
             return []
         }
     }
@@ -140,5 +140,3 @@ public enum LocationKind {
     /// A folder can be found at the location.
     case folder
 }
-
-// swiftlint:enable line_length

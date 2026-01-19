@@ -2,7 +2,6 @@
 //  GetfullpathforRsync.swift
 //  RsyncVerify
 //
-// swiftlint:disable line_length
 
 import Foundation
 import OSLog
@@ -23,9 +22,13 @@ struct GetfullpathforRsync {
                 }
             } else {
                 if SharedReference.shared.macosarm {
-                    Logger.process.debugMessageOnly("GetfullpathforRsync HOMEBREW path ARM: \(SharedReference.shared.usrlocalbinarm.appending("/"))")
+                    Logger.process.debugMessageOnly(
+                        "GetfullpathforRsync HOMEBREW path ARM: \(SharedReference.shared.usrlocalbinarm.appending("/"))"
+                    )
                 } else {
-                    Logger.process.debugMessageOnly("GetfullpathforRsync HOMEBREW path INTEL: \(SharedReference.shared.usrlocalbin.appending("/"))")
+                    Logger.process.debugMessageOnly(
+                        "GetfullpathforRsync HOMEBREW path INTEL: \(SharedReference.shared.usrlocalbin.appending("/"))"
+                    )
                 }
                 if SharedReference.shared.macosarm {
                     return SharedReference.shared.usrlocalbinarm.appending("/") + SharedReference.shared.rsync
@@ -39,5 +42,3 @@ struct GetfullpathforRsync {
         }
     }
 }
-
-// swiftlint:enable line_length

@@ -2,7 +2,6 @@
 //  Resources.swift
 //  RsyncVerify
 //
-// swiftlint:disable line_length
 
 import Foundation
 
@@ -15,9 +14,8 @@ enum ResourceType {
 
 struct Resources {
     // Resource strings
-    private var urlJSON: String = "https://raw.githubusercontent.com/rsyncOSX/RsyncVerify/master/versionRsyncVerify/versionRsyncVerify.json"
+    private var urlJSON: String = "https://raw.githubusercontent.com/rsyncOSX/RsyncVerify/master/" +
+        "versionRsyncVerify/versionRsyncVerify.json"
     // Get the resource.
     func getResource(resource _: ResourceType) -> String { urlJSON }
 }
-
-// swiftlint:enable line_length

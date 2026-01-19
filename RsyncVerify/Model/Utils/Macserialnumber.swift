@@ -13,12 +13,17 @@ struct Macserialnumber {
     // Function for computing MacSerialNumber
     func getMacSerialNumber() -> String {
         // Get the platform expert
-        let platformExpert: io_service_t = IOServiceGetMatchingService(kIOMainPortDefault,
-                                                                       IOServiceMatching("IOPlatformExpertDevice"))
+        let platformExpert: io_service_t = IOServiceGetMatchingService(
+            kIOMainPortDefault,
+            IOServiceMatching("IOPlatformExpertDevice")
+        )
         // Get the serial number as a CFString ( actually as Unmanaged<AnyObject>! )
-        let serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert,
-                                                                     kIOPlatformSerialNumberKey as CFString?,
-                                                                     kCFAllocatorDefault, 0)
+        let serialNumberAsCFString = IORegistryEntryCreateCFProperty(
+            platformExpert,
+            kIOPlatformSerialNumberKey as CFString?,
+            kCFAllocatorDefault,
+            0
+        )
         // Release the platform expert (we're responsible)
         IOObjectRelease(platformExpert)
         // Take the unretained value of the unmanaged-any-object

@@ -15,9 +15,12 @@ final class ArgumentsPullRemote {
             let params = Params().params(config: config)
             let rsyncparameterssynchronize = RsyncParametersPullRemote(parameters: params)
             do {
-                try rsyncparameterssynchronize.argumentsPullRemoteWithParameters(forDisplay: forDisplay,
-                                                                                 verify: false,
-                                                                                 dryrun: dryRun, keepDelete: keepdelete)
+                try rsyncparameterssynchronize.argumentsPullRemoteWithParameters(
+                    forDisplay: forDisplay,
+                    verify: false,
+                    dryrun: dryRun,
+                    keepDelete: keepdelete
+                )
                 return rsyncparameterssynchronize.computedArguments
             } catch {
                 return nil

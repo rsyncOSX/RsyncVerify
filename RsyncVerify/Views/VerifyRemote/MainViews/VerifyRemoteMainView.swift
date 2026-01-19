@@ -165,9 +165,9 @@ struct VerifyRemoteMainView: View {
     private func makeView(view: DestinationVerifyView) -> some View {
         switch view {
         case let .executenpullview(configuuid):
-            executePushPullView(for: configuuid)
+            executePullView(for: configuuid) // PULL
         case let .executenpushview(configuuid):
-            executePushPullView(for: configuuid)
+            executePushView(for: configuuid) // PUSH
         case let .pushview(configuuid):
             pushView(for: configuuid)
         case let .pullview(configuuid):
@@ -207,15 +207,27 @@ struct VerifyRemoteMainView: View {
         }
     }
 
+    // Execute PULL
     @ViewBuilder
-    private func executePushPullView(for configuuid: SynchronizeConfiguration.ID) -> some View {
+    private func executePullView(for configuuid: SynchronizeConfiguration.ID) -> some View {
         if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
            let selectedconfig = rsyncUIdata.configurations?[index] {
-            ExecutePushPullView(
+            ExecutePullView(
                 keepdelete: $keepdelete,
-                pushpullcommand: pushpullcommand,
                 selectedconfig: selectedconfig,
-                rsyncpullmax: pullremotedatanumbers?.maxpushpull ?? 0,
+                rsyncpullmax: pullremotedatanumbers?.maxpushpull ?? 0
+            )
+        }
+    }
+
+    // Execute PUSH
+    @ViewBuilder
+    private func executePushView(for configuuid: SynchronizeConfiguration.ID) -> some View {
+        if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
+           let selectedconfig = rsyncUIdata.configurations?[index] {
+            ExecutePushView(
+                keepdelete: $keepdelete,
+                selectedconfig: selectedconfig,
                 rsyncpushmax: pushremotedatanumbers?.maxpushpull ?? 0
             )
         }

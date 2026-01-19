@@ -2,7 +2,7 @@ import Observation
 import RsyncProcessStreaming
 import SwiftUI
 
-struct ExecutePushPullView: View {
+struct ExecutePullView: View {
     @Binding var keepdelete: Bool
 
     @State private var showprogressview = false
@@ -14,10 +14,8 @@ struct ExecutePushPullView: View {
 
     @State private var executionManager: PushPullExecutionManager?
 
-    let pushpullcommand: PushPullCommand
     let selectedconfig: SynchronizeConfiguration
     let rsyncpullmax: Double
-    let rsyncpushmax: Double
 
     var body: some View {
         HStack {
@@ -27,26 +25,13 @@ struct ExecutePushPullView: View {
                 HStack {
                     executeview
 
-                    if pushpullcommand == .pullRemote {
-                        let totalPull = Double(rsyncpullmax)
-                        SynchronizeProgressView(max: Double(rsyncpullmax),
-                                                progress: min(Swift.max(progress, 0), totalPull),
-                                                statusText: "Pull Remote")
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                            )
-
-                    } else {
-                        let totalPush = Double(rsyncpushmax)
-                        SynchronizeProgressView(max: Double(rsyncpushmax),
-                                                progress: min(Swift.max(progress, 0), totalPush),
-                                                statusText: "Push Local")
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                            )
-                    }
+                    SynchronizeProgressView(max: Double(rsyncpullmax),
+                                            progress: min(Swift.max(progress, 0), Double(rsyncpullmax)),
+                                            statusText: "Pull Remote")
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
                 }
             }
         }
@@ -76,22 +61,12 @@ struct ExecutePushPullView: View {
     var executeview: some View {
         VStack {
             HStack {
-                if pushpullcommand == .pushLocal {
-                    ConditionalGlassButton(
-                        systemImage: "arrowshape.right.fill",
-                        helpText: "Push to remote"
-                    ) {
-                        showprogressview = true
-                        executePush()
-                    }
-                } else if pushpullcommand == .pullRemote {
-                    ConditionalGlassButton(
-                        systemImage: "arrowshape.left.fill",
-                        helpText: "Pull from remote"
-                    ) {
-                        showprogressview = true
-                        executePull()
-                    }
+                ConditionalGlassButton(
+                    systemImage: "arrowshape.left.fill",
+                    helpText: "Pull from remote"
+                ) {
+                    showprogressview = true
+                    executePull()
                 }
 
                 VStack(alignment: .leading) {

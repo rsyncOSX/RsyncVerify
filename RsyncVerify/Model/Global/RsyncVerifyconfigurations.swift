@@ -45,12 +45,6 @@ final class RsyncVerifyconfigurations {
         } ?? false
     }
 
-    @ObservationIgnored var oneormoresynchronizetasksisremoteOpenrsync: Bool {
-        configurations?.contains { $0.task == SharedReference.shared.synchronize &&
-            !$0.offsiteServer.isEmpty
-        } ?? false
-    }
-
     @ObservationIgnored var externalurlrequestinprogress: Bool = false
     @ObservationIgnored var executetasksinprogress: Bool = false
 

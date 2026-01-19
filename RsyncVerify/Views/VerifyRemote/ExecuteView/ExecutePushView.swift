@@ -68,6 +68,7 @@ struct ExecutePushView: View {
                     showprogressview = true
                     executePush()
                 }
+                .padding()
 
                 VStack(alignment: .leading) {
                     Toggle("--dry-run", isOn: $dryrun)
@@ -90,13 +91,13 @@ struct ExecutePushView: View {
                 .padding()
             }
 
-            /*
-             PushPullCommandView(pushpullcommand: pushpullcommand,
-                                 dryrun: $dryrun,
-                                 keepdelete: $keepdelete,
-                                 config: selectedconfig)
-                 .padding()
-              */
+            PushPullCommandView(
+                dryrun: $dryrun,
+                keepdelete: $keepdelete,
+                config: selectedconfig,
+                push: true
+            )
+            .padding()
         }
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -126,28 +127,6 @@ struct ExecutePushView: View {
         }
 
         executionManager?.executePush()
-    }
-
-    private func executePull() {
-        executionManager = PushPullExecutionManager(
-            config: selectedconfig,
-            dryrun: dryrun,
-            keepdelete: keepdelete
-        )
-
-        executionManager?.onProgressUpdate = { newProgress in
-            Task { @MainActor in
-                progress = newProgress
-            }
-        }
-
-        executionManager?.onCompletion = { result in
-            Task { @MainActor in
-                handleCompletion(result: result)
-            }
-        }
-
-        executionManager?.executePull()
     }
 
     private func handleCompletion(result: PushPullExecutionResult) {

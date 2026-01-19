@@ -38,7 +38,6 @@ struct VerifyRemoteMainView: View {
     @State private var keepdelete: Bool = false
     @State private var pushonly: Bool = false
     @State private var pullonly: Bool = false
-    @State private var pushpullcommand = PushPullCommand.pushLocal
     @State private var verifypath: [Verify] = []
     @State var showinspector: Bool = false
     @State private var pullremotedatanumbers: RemoteDataNumbers?

@@ -8,28 +8,17 @@
 import SwiftUI
 
 struct PushPullCommandView: View {
-    @Binding var pushpullcommand: PushPullCommand
     @Binding var dryrun: Bool
     @Binding var keepdelete: Bool
 
     let config: SynchronizeConfiguration
+    let push: Bool
 
     var body: some View {
         VStack(alignment: .leading) {
-            pickerselectcommand
-                .padding(10)
             showcommand
         }
         .padding()
-    }
-
-    var pickerselectcommand: some View {
-        Picker("", selection: $pushpullcommand) {
-            ForEach(PushPullCommand.allCases) { Text($0.description)
-                .tag($0)
-            }
-        }
-        .pickerStyle(RadioGroupPickerStyle())
     }
 
     var showcommand: some View {
@@ -46,7 +35,7 @@ struct PushPullCommandView: View {
     }
 
     var commandstring: String? {
-        PushPullCommandtoDisplay(display: pushpullcommand,
+        PushPullCommandtoDisplay(push: push,
                                  config: config,
                                  dryRun: dryrun,
                                  keepdelete: keepdelete).command

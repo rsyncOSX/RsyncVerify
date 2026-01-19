@@ -11,6 +11,7 @@ import SwiftUI
 struct PushPullCombinedDetailsView: View {
     @Binding var verifypath: [Verify]
 
+    let selectedconfig: SynchronizeConfiguration
     let pushremotedatanumbers: RemoteDataNumbers?
     let pullremotedatanumbers: RemoteDataNumbers?
     let istagged: Bool
@@ -18,15 +19,17 @@ struct PushPullCombinedDetailsView: View {
     var body: some View {
         HStack {
             PushDetailsSection(
+                verifypath: $verifypath,
+                selectedconfig: selectedconfig,
                 pushremotedatanumbers: pushremotedatanumbers,
-                istagged: istagged,
-                verifypath: $verifypath
+                istagged: istagged
             )
 
             PullDetailsSection(
+                verifypath: $verifypath,
+                selectedconfig: selectedconfig,
                 pullremotedatanumbers: pullremotedatanumbers,
-                istagged: istagged,
-                verifypath: $verifypath
+                istagged: istagged
             )
         }
     }

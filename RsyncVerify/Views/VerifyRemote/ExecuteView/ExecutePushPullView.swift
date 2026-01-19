@@ -3,7 +3,6 @@ import RsyncProcessStreaming
 import SwiftUI
 
 struct ExecutePushPullView: View {
-    @Binding var pushpullcommand: PushPullCommand
     @Binding var keepdelete: Bool
 
     @State private var showprogressview = false
@@ -15,8 +14,8 @@ struct ExecutePushPullView: View {
 
     @State private var executionManager: PushPullExecutionManager?
 
-    let config: SynchronizeConfiguration
-    let pushorpullbool: Bool // True if pull data
+    let pushpullcommand: PushPullCommand
+    let selectedconfig: SynchronizeConfiguration
     let rsyncpullmax: Double
     let rsyncpushmax: Double
 
@@ -116,11 +115,13 @@ struct ExecutePushPullView: View {
                 .padding()
             }
 
-            PushPullCommandView(pushpullcommand: $pushpullcommand,
-                                dryrun: $dryrun,
-                                keepdelete: $keepdelete,
-                                config: config)
-                .padding()
+            /*
+             PushPullCommandView(pushpullcommand: pushpullcommand,
+                                 dryrun: $dryrun,
+                                 keepdelete: $keepdelete,
+                                 config: selectedconfig)
+                 .padding()
+              */
         }
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -131,7 +132,7 @@ struct ExecutePushPullView: View {
 
     private func executePush() {
         executionManager = PushPullExecutionManager(
-            config: config,
+            config: selectedconfig,
             dryrun: dryrun,
             keepdelete: keepdelete
         )
@@ -154,7 +155,7 @@ struct ExecutePushPullView: View {
 
     private func executePull() {
         executionManager = PushPullExecutionManager(
-            config: config,
+            config: selectedconfig,
             dryrun: dryrun,
             keepdelete: keepdelete
         )
@@ -188,12 +189,12 @@ struct ExecutePushPullView: View {
             let suboutput = PrepareOutputFromRsync().prepareOutputFromRsync(output)
             remotedatanumbers = RemoteDataNumbers(
                 stringoutputfromrsync: suboutput,
-                config: config
+                config: selectedconfig
             )
         } else {
             remotedatanumbers = RemoteDataNumbers(
                 stringoutputfromrsync: result.output,
-                config: config
+                config: selectedconfig
             )
         }
 

@@ -16,7 +16,7 @@ struct EstimatePushandPull: View {
     // tagged or not
     @Binding var istagged: Bool
 
-    let config: SynchronizeConfiguration
+    let selectedconfig: SynchronizeConfiguration
 
     @State private var pullCompleted = false
     @State private var pushCompleted = false
@@ -28,20 +28,22 @@ struct EstimatePushandPull: View {
         ZStack {
             if pullCompleted, pushCompleted {
                 HStack {
-                    PushDetailsSection(pushremotedatanumbers: pushremotedatanumbers,
-                                       istagged: istagged,
-                                       verifypath: $verifypath)
+                    PushDetailsSection(verifypath: $verifypath,
+                                       selectedconfig: selectedconfig,
+                                       pushremotedatanumbers: pushremotedatanumbers,
+                                       istagged: istagged)
 
-                    PullDetailsSection(pullremotedatanumbers: pullremotedatanumbers,
-                                       istagged: istagged,
-                                       verifypath: $verifypath)
+                    PullDetailsSection(verifypath: $verifypath,
+                                       selectedconfig: selectedconfig,
+                                       pullremotedatanumbers: pullremotedatanumbers,
+                                       istagged: istagged)
                 }
 
             } else {
                 HStack {
                     ProgressView()
 
-                    Text("Estimating \(config.backupID) PUSH and PULL, please wait ...")
+                    Text("Estimating \(selectedconfig.backupID) PUSH and PULL, please wait ...")
                         .font(.title2)
                 }
             }
@@ -58,14 +60,14 @@ struct EstimatePushandPull: View {
 
     private func startPullEstimation() {
         let estimate = EstimatePull(
-            config: config,
+            config: selectedconfig,
             onComplete: { [self] in
                 handlePullCompletion()
             }
         )
 
         estimatePull = estimate
-        estimate.pullRemote(config: config)
+        estimate.pullRemote(config: selectedconfig)
     }
 
     private func handlePullCompletion() {
@@ -81,14 +83,14 @@ struct EstimatePushandPull: View {
 
     private func startPushEstimation() {
         let estimate = EstimatePush(
-            config: config,
+            config: selectedconfig,
             onComplete: { [self] in
                 handlePushCompletion()
             }
         )
 
         estimatePush = estimate
-        estimate.pushRemote(config: config)
+        estimate.pushRemote(config: selectedconfig)
     }
 
     private func handlePushCompletion() {

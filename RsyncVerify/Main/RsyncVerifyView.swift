@@ -34,11 +34,6 @@ struct RsyncVerifyView: View {
         }
         .task(id: selectedprofileID) {
             var profile: String?
-            // Only for external URL
-            guard rsyncUIdata.externalurlrequestinprogress == false else {
-                rsyncUIdata.externalurlrequestinprogress = false
-                return
-            }
 
             if let index = rsyncUIdata.validprofiles.firstIndex(where: { $0.id == selectedprofileID }) {
                 rsyncUIdata.profile = rsyncUIdata.validprofiles[index].profilename

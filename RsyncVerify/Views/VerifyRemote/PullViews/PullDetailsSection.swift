@@ -9,23 +9,21 @@ import OSLog
 import SwiftUI
 
 struct PullDetailsSection: View {
+    @Binding var verifypath: [Verify]
+
+    let selectedconfig: SynchronizeConfiguration
     let pullremotedatanumbers: RemoteDataNumbers?
     let istagged: Bool
-    @Binding var verifypath: [Verify]
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                HStack {
-                    Text(Image(systemName: "arrow.left")) + Text("Pull ")
+                ConditionalGlassButton(
+                    systemImage: "arrow.left",
+                    helpText: "Pull from remote"
+                ) {
+                    verifypath.append(Verify(task: .executenpullview(configID: selectedconfig.id)))
                 }
-                .font(.title2)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
-                .padding(10)
 
                 ConditionalGlassButton(
                     systemImage: "square.and.arrow.down.fill",
@@ -46,6 +44,7 @@ struct PullDetailsSection: View {
                     verifypath.append(Verify(task: .analyseviewpull))
                 }
             }
+            .padding()
 
             if let pullremotedatanumbers {
                 DetailsVerifyView(remotedatanumbers: pullremotedatanumbers,

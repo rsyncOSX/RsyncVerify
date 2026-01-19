@@ -9,7 +9,10 @@ import OSLog
 import SwiftUI
 
 enum DestinationVerifyView: Hashable {
-    case executenpushpullview(configID: SynchronizeConfiguration.ID)
+    // PULL
+    case executenpullview(configID: SynchronizeConfiguration.ID)
+    // PUSH
+    case executenpushview(configID: SynchronizeConfiguration.ID)
     case pushview(configID: SynchronizeConfiguration.ID)
     case pullview(configID: SynchronizeConfiguration.ID)
     case analyseviewpush
@@ -161,8 +164,10 @@ struct VerifyRemoteMainView: View {
     @ViewBuilder
     private func makeView(view: DestinationVerifyView) -> some View {
         switch view {
-        case let .executenpushpullview(configuuid):
-            executePushPullView(for: configuuid)
+        case let .executenpullview(configuuid):
+            executePullView(for: configuuid) // PULL
+        case let .executenpushview(configuuid):
+            executePushView(for: configuuid) // PUSH
         case let .pushview(configuuid):
             pushView(for: configuuid)
         case let .pullview(configuuid):
@@ -172,13 +177,19 @@ struct VerifyRemoteMainView: View {
         case .analyseviewpull:
             analyseView(for: pullremotedatanumbers)
         case .pushviewonly:
-            PushDetailsSection(pushremotedatanumbers: pushremotedatanumbers,
-                               istagged: istagged,
-                               verifypath: $verifypath)
+            if let selectedconfig {
+                PushDetailsSection(verifypath: $verifypath,
+                                   selectedconfig: selectedconfig,
+                                   pushremotedatanumbers: pushremotedatanumbers,
+                                   istagged: istagged)
+            }
         case .pullviewonly:
-            PullDetailsSection(pullremotedatanumbers: pullremotedatanumbers,
-                               istagged: istagged,
-                               verifypath: $verifypath)
+            if let selectedconfig {
+                PullDetailsSection(verifypath: $verifypath,
+                                   selectedconfig: selectedconfig,
+                                   pullremotedatanumbers: pullremotedatanumbers,
+                                   istagged: istagged)
+            }
         case let .estimatepushandpullview(configuuid):
             estimatePushPullView(for: configuuid)
         }
@@ -192,20 +203,31 @@ struct VerifyRemoteMainView: View {
                                 pushremotedatanumbers: $pushremotedatanumbers,
                                 pullremotedatanumbers: $pullremotedatanumbers,
                                 istagged: $istagged,
-                                config: config)
+                                selectedconfig: config)
         }
     }
 
+    // Execute PULL
     @ViewBuilder
-    private func executePushPullView(for configuuid: SynchronizeConfiguration.ID) -> some View {
+    private func executePullView(for configuuid: SynchronizeConfiguration.ID) -> some View {
         if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
-           let config = rsyncUIdata.configurations?[index] {
-            ExecutePushPullView(
-                pushpullcommand: $pushpullcommand,
+           let selectedconfig = rsyncUIdata.configurations?[index] {
+            ExecutePullView(
                 keepdelete: $keepdelete,
-                config: config,
-                pushorpullbool: pushorpull(),
-                rsyncpullmax: pullremotedatanumbers?.maxpushpull ?? 0,
+                selectedconfig: selectedconfig,
+                rsyncpullmax: pullremotedatanumbers?.maxpushpull ?? 0
+            )
+        }
+    }
+
+    // Execute PUSH
+    @ViewBuilder
+    private func executePushView(for configuuid: SynchronizeConfiguration.ID) -> some View {
+        if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
+           let selectedconfig = rsyncUIdata.configurations?[index] {
+            ExecutePushView(
+                keepdelete: $keepdelete,
+                selectedconfig: selectedconfig,
                 rsyncpushmax: pushremotedatanumbers?.maxpushpull ?? 0
             )
         }
@@ -244,14 +266,6 @@ struct VerifyRemoteMainView: View {
         if let output = remotedatanumbers?.outputfromrsync {
             AsyncAnalyseView(output: output)
         }
-    }
-
-    private func pushorpull() -> Bool {
-        if let pushcount = pushremotedatanumbers?.maxpushpull,
-           let pullcount = pullremotedatanumbers?.maxpushpull {
-            return pushcount > pullcount
-        }
-        return false
     }
 
     private var disabledpushpull: Bool {

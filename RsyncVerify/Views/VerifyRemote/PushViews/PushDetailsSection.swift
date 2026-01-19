@@ -9,23 +9,21 @@ import OSLog
 import SwiftUI
 
 struct PushDetailsSection: View {
+    @Binding var verifypath: [Verify]
+
+    let selectedconfig: SynchronizeConfiguration
     let pushremotedatanumbers: RemoteDataNumbers?
     let istagged: Bool
-    @Binding var verifypath: [Verify]
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                HStack {
-                    Text("Push ") + Text(Image(systemName: "arrow.right"))
+                ConditionalGlassButton(
+                    systemImage: "arrow.right",
+                    helpText: "Push to remote"
+                ) {
+                    verifypath.append(Verify(task: .executenpushview(configID: selectedconfig.id)))
                 }
-                .font(.title2)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
-                .padding(10)
 
                 ConditionalGlassButton(
                     systemImage: "square.and.arrow.down.fill",
@@ -46,6 +44,7 @@ struct PushDetailsSection: View {
                     verifypath.append(Verify(task: .analyseviewpush))
                 }
             }
+            .padding()
 
             if let pushremotedatanumbers {
                 DetailsVerifyView(remotedatanumbers: pushremotedatanumbers,

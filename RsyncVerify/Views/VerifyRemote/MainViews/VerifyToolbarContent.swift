@@ -18,22 +18,25 @@ struct VerifyToolbarContent: ToolbarContent {
     @Binding var selectedconfigBinding: SynchronizeConfiguration?
 
     var body: some ToolbarContent {
-        if pushandpullestimated == true, !verifypath.contains(where: { if case .executenpushpullview = $0.task { true } else { false } }) {
-            ToolbarItem {
-                ConditionalGlassButton(
-                    systemImage: "figure.run",
-                    helpText: "Excute"
-                ) {
-                    guard let selectedconfig else { return }
-                    verifypath.append(Verify(task: .executenpushpullview(configID: selectedconfig.id)))
-                }
-                .disabled(disabledpushpull)
-            }
-        }
+        /*
+         if pushandpullestimated == true, !verifypath.contains(where: { if case .executenpushpullview = $0.task { true } else { false } }) {
+             ToolbarItem {
+                 ConditionalGlassButton(
+                     systemImage: "figure.run",
+                     helpText: "Excute"
+                 ) {
+                     guard let selectedconfig else { return }
+                     verifypath.append(Verify(task: .executenpushpullview(configID: selectedconfig.id)))
+                 }
+                 .disabled(disabledpushpull)
+             }
+         }
 
-        ToolbarItem {
-            Spacer()
-        }
+         ToolbarItem {
+             Spacer()
+         }
+
+          */
 
         ToolbarItem {
             ConditionalGlassButton(

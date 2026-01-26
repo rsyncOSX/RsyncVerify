@@ -10,15 +10,15 @@
       "layers" : [
         {
           "fill" : {
-            "solid" : "display-p3:0.11535,0.18199,0.95876,1.00000"
+            "solid" : "display-p3:0.02638,0.95876,0.31323,1.00000"
           },
           "image-name" : "verify.png",
           "name" : "verify",
           "position" : {
-            "scale" : 0.2,
+            "scale" : 0.6,
             "translation-in-points" : [
               0,
-              -177.9609375
+              0
             ]
           }
         }
@@ -36,6 +36,7 @@
     {
       "layers" : [
         {
+          "hidden" : true,
           "image-name" : "cloud 3.png",
           "name" : "cloud 3"
         }
@@ -53,6 +54,7 @@
       "layers" : [
         {
           "blend-mode" : "normal",
+          "hidden" : true,
           "image-name" : "icon_512x512@2x_1_numbers.png",
           "name" : "icon_512x512@2x_1_numbers"
         }

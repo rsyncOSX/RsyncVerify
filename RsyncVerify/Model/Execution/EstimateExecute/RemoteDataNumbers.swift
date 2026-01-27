@@ -32,23 +32,23 @@ struct RemoteDataNumbers: Identifiable, Hashable {
     var offsiteCatalog: String = ""
     var offsiteServer: String = ""
     var backupID: String = ""
-    // Max for push and pull
+    /// Max for push and pull
     var maxpushpull: Double = 0
 
-    // Detailed output used in Views, allocated as part of process termination estimate
+    /// Detailed output used in Views, allocated as part of process termination estimate
     var outputfromrsync: [RsyncOutputData]?
-    // True if data to synchronize
+    /// True if data to synchronize
     var datatosynchronize: Bool = false
-    // Ask if synchronizing so much data
-    // is true or not. If not either yes,
-    // new task or no if like server is not
-    // online.
+    /// Ask if synchronizing so much data
+    /// is true or not. If not either yes,
+    /// new task or no if like server is not
+    /// online.
     var confirmexecute: Bool = false
-    // Summarized stats
+    /// Summarized stats
     var stats: String?
-    // A reduced number of output
+    /// A reduced number of output
     var preparedoutputfromrsync: [String]?
-    // Number of lines in output to handle
+    /// Number of lines in output to handle
     let numberoflines = 20
 
     private mutating func defaultvalues() {

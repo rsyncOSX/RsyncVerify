@@ -9,11 +9,11 @@ import SwiftUI
 
 struct EstimatePushandPull: View {
     @Binding var verifypath: [Verify]
-    // Push data to remote, adjusted
+    /// Push data to remote, adjusted
     @Binding var pushremotedatanumbers: RemoteDataNumbers?
-    // Pull data from remote, adjusted
+    /// Pull data from remote, adjusted
     @Binding var pullremotedatanumbers: RemoteDataNumbers?
-    // tagged or not
+    /// tagged or not
     @Binding var istagged: Bool
 
     let selectedconfig: SynchronizeConfiguration
@@ -53,9 +53,13 @@ struct EstimatePushandPull: View {
         }
     }
 
-    func onCompletepull() { pullCompleted = true }
+    func onCompletepull() {
+        pullCompleted = true
+    }
 
-    func onCompletepush() { pushCompleted = true }
+    func onCompletepush() {
+        pushCompleted = true
+    }
 
     private func startPullEstimation() {
         let estimate = EstimatePull(

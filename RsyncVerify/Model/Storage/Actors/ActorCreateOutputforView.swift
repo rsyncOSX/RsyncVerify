@@ -8,7 +8,7 @@
 import OSLog
 
 actor ActorCreateOutputforView {
-    // From Array[String]
+    /// From Array[String]
     @concurrent
     nonisolated func createOutputForView(_ stringoutputfromrsync: [String]?) async -> [RsyncOutputData] {
         Logger.process.debugThreadOnly("ActorCreateOutputforView: createaoutputforview()")
@@ -20,7 +20,7 @@ actor ActorCreateOutputforView {
         return []
     }
 
-    // From Set<String>
+    /// From Set<String>
     @concurrent
     nonisolated func createOutputForView(_ setoutputfromrsync: Set<String>?) async -> [RsyncOutputData] {
         Logger.process.debugThreadOnly("ActorCreateOutputforView: createaoutputforview()")

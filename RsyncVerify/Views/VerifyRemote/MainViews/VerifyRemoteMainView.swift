@@ -9,7 +9,7 @@ import OSLog
 import SwiftUI
 
 enum DestinationVerifyView: Hashable {
-    // PULL
+    /// PULL
     case executenpullview(configID: SynchronizeConfiguration.ID)
     // PUSH
     case executenpushview(configID: SynchronizeConfiguration.ID)
@@ -206,7 +206,7 @@ struct VerifyRemoteMainView: View {
         }
     }
 
-    // Execute PULL
+    /// Execute PULL
     @ViewBuilder
     private func executePullView(for configuuid: SynchronizeConfiguration.ID) -> some View {
         if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),
@@ -219,7 +219,7 @@ struct VerifyRemoteMainView: View {
         }
     }
 
-    // Execute PUSH
+    /// Execute PUSH
     @ViewBuilder
     private func executePushView(for configuuid: SynchronizeConfiguration.ID) -> some View {
         if let index = rsyncUIdata.configurations?.firstIndex(where: { $0.id == configuuid }),

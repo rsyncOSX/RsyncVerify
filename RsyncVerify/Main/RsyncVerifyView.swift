@@ -9,7 +9,7 @@ import OSLog
 import SwiftUI
 
 struct RsyncVerifyView: View {
-    // Selected profile
+    /// Selected profile
     @State private var selectedprofileID: ProfilesnamesRecord.ID?
     // Set version of rsync to use
     @State private var rsyncversion = Rsyncversion()

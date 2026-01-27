@@ -28,7 +28,7 @@ final class EstimatePull {
         pullremotedatanumbers = nil
     }
 
-    // For check remote, pull remote data
+    /// For check remote, pull remote data
     func pullRemote(config: SynchronizeConfiguration) {
         let arguments = ArgumentsPullRemote(config: config).argumentspullremotewithparameters(
             dryRun: true,

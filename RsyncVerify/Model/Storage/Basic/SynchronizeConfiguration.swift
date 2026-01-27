@@ -31,11 +31,11 @@ struct SynchronizeConfiguration: Identifiable, Codable {
     // Snapshots, day to save and last = 1 or every last=0
     var snapdayoffweek: String?
     var snaplast: Int?
-    // task is halted
+    /// task is halted
     var halted: Int
 
-    // Used when reading JSON data from store
-    // see in ReadSynchronizeConfigurationJSON
+    /// Used when reading JSON data from store
+    /// see in ReadSynchronizeConfigurationJSON
     init(_ data: DecodeSynchronizeConfiguration) {
         backupID = data.backupID ?? ""
         if let datahideenID = data.hiddenID {
@@ -66,7 +66,7 @@ struct SynchronizeConfiguration: Identifiable, Codable {
         halted = data.halted ?? 0
     }
 
-    // Create an empty record with no values
+    /// Create an empty record with no values
     init() {
         hiddenID = -1
         task = ""

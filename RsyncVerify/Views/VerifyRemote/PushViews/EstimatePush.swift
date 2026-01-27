@@ -28,7 +28,7 @@ final class EstimatePush {
         pushremotedatanumbers = nil
     }
 
-    // For check remote, push remote data
+    /// For check remote, push remote data
     func pushRemote(config: SynchronizeConfiguration) {
         let arguments = ArgumentsSynchronize(config: config).argumentsforpushlocaltoremotewithparameters(
             dryRun: true,
@@ -73,7 +73,7 @@ final class EstimatePush {
         }
     }
 
-    // This is a normal synchronize task, dry-run = true
+    /// This is a normal synchronize task, dry-run = true
     func pushProcessTermination(stringoutputfromrsync: [String]?, hiddenID _: Int?) async {
         // Process output
         let processedOutput: [String]? = if let output = stringoutputfromrsync, output.count > 17 {
